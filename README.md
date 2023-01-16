@@ -49,3 +49,10 @@ listo para ser utilizado.
 
 Para ejecutar el programa, dentro del directorio /SEM/ creado, ejecute SEM.bat. Esto ejecutará automáticamente el script PFGUI.py.
 
+
+#### Tareas pendientes
+
+- [ ] Revisar la licencia del repo [https://github.com/ldemattos/readPL4] y mencionar que se utilizó en la función readPL4() de PFGUI.py.
+      Actualizar licencia acorde a lo anterior.
+- [ ] Crear un ejecutable de todo el programa. Por alguna razón al agreagar multiprocess, ya no compila correctamente un ejecutable.
+
