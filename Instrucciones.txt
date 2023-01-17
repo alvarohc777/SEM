@@ -1,0 +1,9 @@
+Para instalar la herramienta SEM ejecutar el archivo SEMSetup.bat
+
+
+Para iniciar la herramienta posteriormente utilizar el archivo SEM.bat
+o su acceso directo, este puede ser movido al escritorio o cualquier 
+otra carpeta donde se requiera.
+
+Se debe verificar que las direcciones de ejecución del solver.bat correspondan a las direcciones donde se tiene instalado
+el ATP. Para ello modificar las línas 807 y 847 de PFGUI.py; la línea 13 de SEMSetup.bat y la primera línea de solver.bat
