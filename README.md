@@ -56,3 +56,6 @@ Para ejecutar el programa, dentro del directorio /SEM/ creado, ejecute SEM.bat. 
       Actualizar licencia acorde a lo anterior.
 - [ ] Crear un ejecutable de todo el programa. Por alguna razón al agreagar multiprocess, ya no compila correctamente un ejecutable.
 
+#### Tener en cuenta
+
+- Cuando se vaya a utilizar la herramienta en producción, se deben eliminar las carpetas \env\ y \batch_files\ del instalador_SEM/
