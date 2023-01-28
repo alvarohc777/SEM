@@ -12,21 +12,22 @@ C 345678901234567890123456789012345678901234567890123456789012345678901234567890
 /BRANCH
 C < n1 >< n2 ><ref1><ref2>< R  >< L  >< C  >
 C < n1 >< n2 ><ref1><ref2>< R  >< A  >< B  ><Leng><><>0
-  X0002A                      1.  .001                                         0
-  X0002B                      1.  .001                                         0
-  X0002C                      1.  .001                                         0
+  X0001A                      1.  .001                                         0
+  X0001B                      1.  .001                                         0
+  X0001C                      1.  .001                                         0
 /SWITCH
 C < n 1>< n 2>< Tclose ><Top/Tde ><   Ie   ><Vf/CLOP ><  type  >
-  X0001AX0002A                                        MEASURING                1
-  X0001BX0002B                                        MEASURING                1
-  X0001CX0002C                                        MEASURING                1
+  SRCA  X0001A                                        MEASURING                1
+  SRCB  X0001B                                        MEASURING                1
+  SRCC  X0001C                                        MEASURING                1
 /SOURCE
 C < n 1><>< Ampl.  >< Freq.  ><Phase/T0><   A1   ><   T1   >< TSTART >< TSTOP  >
-14X0001A  8164.96581       60.123.123457                           -1.      100.
-14X0001B  8164.96581       60.3.12345679                           -1.      100.
-14X0001C  8164.96581       60.-116.87654                           -1.      100.
+C MainSource
+14SRCA    8164.96581       60. 123.12345                           -1.      100.
+14SRCB    8164.96581       60.   3.12345                           -1.      100.
+14SRCC    8164.96581       60.-116.87655                           -1.      100.
 /OUTPUT
-  X0002AX0002BX0002C
+  X0001AX0001BX0001C
 BLANK BRANCH
 BLANK SWITCH
 BLANK SOURCE
