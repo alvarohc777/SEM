@@ -19,124 +19,119 @@ import concurrent.futures
 from itertools import repeat
 import time
 from glob import glob
-    
+
+
 def readPL4(pl4file):
-        miscData = {"deltat": 0.0, "nvar": 0, "pl4size": 0, "steps": 0, "tmax": 0.0}
+    miscData = {"deltat": 0.0, "nvar": 0, "pl4size": 0, "steps": 0, "tmax": 0.0}
 
-        with open("SCENARIOS_ATP\\" + pl4file, "rb") as f:
+    with open("SCENARIOS_ATP\\" + pl4file, "rb") as f:
 
-            pl4 = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
+        pl4 = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
 
-            # Read DELTAT
-            miscData["deltat"] = struct.unpack("<f", pl4[40:44])[0]
-            DT = miscData["deltat"]
+        # Read DELTAT
+        miscData["deltat"] = struct.unpack("<f", pl4[40:44])[0]
+        DT = miscData["deltat"]
 
-            # Read number of vars
-            miscData["nvar"] = struct.unpack("<L", pl4[48:52])[0] / 2
-            nv = int(miscData["nvar"])
+        # Read number of vars
+        miscData["nvar"] = struct.unpack("<L", pl4[48:52])[0] / 2
+        nv = int(miscData["nvar"])
 
-            # Read PL4 disk size
-            miscData["pl4size"] = struct.unpack("<L", pl4[56:60])[0] - 1
+        # Read PL4 disk size
+        miscData["pl4size"] = struct.unpack("<L", pl4[56:60])[0] - 1
 
-            # Compute the number of simulation miscData['steps'] from the PL4's file size
-            miscData["steps"] = (
-                miscData["pl4size"] - 5 * 16 - miscData["nvar"] * 16
-            ) / ((miscData["nvar"] + 1) * 4)
-            step = int(miscData["steps"])
+        # Compute the number of simulation miscData['steps'] from the PL4's file size
+        miscData["steps"] = (miscData["pl4size"] - 5 * 16 - miscData["nvar"] * 16) / (
+            (miscData["nvar"] + 1) * 4
+        )
+        step = int(miscData["steps"])
 
-            miscData["tmax"] = (miscData["steps"] - 1) * miscData["deltat"]
+        miscData["tmax"] = (miscData["steps"] - 1) * miscData["deltat"]
 
-            # generate pandas dataframe to store PL4's header
-            dfHEAD = pd.DataFrame(columns=["TYPE", "FROM", "TO"])
+        # generate pandas dataframe to store PL4's header
+        dfHEAD = pd.DataFrame(columns=["TYPE", "FROM", "TO"])
 
-            for i in range(0, nv):
-                pos = 5 * 16 + i * 16
-                h = struct.unpack("3x1c6s6s", pl4[pos : pos + 16])
-                dfHEAD = dfHEAD.append(
-                    {"TYPE": int(h[0]), "FROM": h[1], "TO": h[2]}, ignore_index=True
-                )
-                dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(
-                    lambda x: "V-node" if x == 4 else x
-                )
-                dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(
-                    lambda x: "E-bran" if x == 7 else x
-                )
-                dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(
-                    lambda x: "V-bran" if x == 8 else x
-                )
-                dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(
-                    lambda x: "I-bran" if x == 9 else x
-                )
-
-            data = np.memmap(
-                f,
-                dtype=np.float32,
-                mode="r",
-                shape=(step, nv + 1),
-                offset=5 * 16 + nv * 16,
+        for i in range(0, nv):
+            pos = 5 * 16 + i * 16
+            h = struct.unpack("3x1c6s6s", pl4[pos : pos + 16])
+            dfHEAD = dfHEAD.append(
+                {"TYPE": int(h[0]), "FROM": h[1], "TO": h[2]}, ignore_index=True
             )
-            currentDirectory = os.getcwd()
-            file_path = currentDirectory + "\\SCENARIOS_ATP\\"
-            initial = time.time()
-            archivopl4 = pl4file
+            dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "V-node" if x == 4 else x)
+            dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "E-bran" if x == 7 else x)
+            dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "V-bran" if x == 8 else x)
+            dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "I-bran" if x == 9 else x)
 
-            # ------------ CONVERT DATA TO CSV--------------#
-            header_1 = dfHEAD.iloc[:, 0].to_list()
-            header_2 = dfHEAD.iloc[:, 1].to_list()
-            header_3 = dfHEAD.iloc[:, 2].to_list()
+        data = np.memmap(
+            f,
+            dtype=np.float32,
+            mode="r",
+            shape=(step, nv + 1),
+            offset=5 * 16 + nv * 16,
+        )
+        currentDirectory = os.getcwd()
+        file_path = currentDirectory + "\\SCENARIOS_ATP\\"
+        initial = time.time()
+        archivopl4 = pl4file
 
-            header_1.insert(0, "time".ljust(6))
-            header_2.insert(0, "".ljust(6))
-            header_3.insert(0, "".ljust(6))
+        # ------------ CONVERT DATA TO CSV--------------#
+        header_1 = dfHEAD.iloc[:, 0].to_list()
+        header_2 = dfHEAD.iloc[:, 1].to_list()
+        header_3 = dfHEAD.iloc[:, 2].to_list()
 
-            header = pd.MultiIndex.from_arrays([header_1, header_2, header_3])
-            data = pd.DataFrame(data, columns=header)
+        header_1.insert(0, "time".ljust(6))
+        header_2.insert(0, "".ljust(6))
+        header_3.insert(0, "".ljust(6))
 
-            csv_path = currentDirectory + "\\ARCHIVOS CSV"
-            path_array = csv_path.split("\\")
-            s = ""
+        header = pd.MultiIndex.from_arrays([header_1, header_2, header_3])
+        data = pd.DataFrame(data, columns=header)
 
-            for x in path_array:
-                s = s + x
-                try:
-                    os.stat(s)
-                except Exception as e:
-                    os.mkdir(s)
+        csv_path = currentDirectory + "\\ARCHIVOS CSV"
+        path_array = csv_path.split("\\")
+        s = ""
 
-                s = s + "\\"
-            csv_name = csv_path + "\\" + archivopl4.split(".")[0] + ".csv"
-            data.to_csv(csv_name, sep=";", index=False)
-            final = time.time()
+        for x in path_array:
+            s = s + x
+            try:
+                os.stat(s)
+            except Exception as e:
+                os.mkdir(s)
+
+            s = s + "\\"
+        csv_name = csv_path + "\\" + archivopl4.split(".")[0] + ".csv"
+        data.to_csv(csv_name, sep=";", index=False)
+        final = time.time()
+
 
 def atp_run(filename, ext, current_directory, solver):
 
-        t1 = time.perf_counter()
+    t1 = time.perf_counter()
 
-        pl4_filename = filename.replace(".atp", ".pl4")
-        print(f"Iniciando {filename}")
-        atp_file_path = current_directory + "\\SCENARIOS_ATP"
-        atp_file_name = atp_file_path + "\\" + filename
+    pl4_filename = filename.replace(".atp", ".pl4")
+    print(f"Iniciando {filename}")
+    atp_file_path = current_directory + "\\SCENARIOS_ATP"
+    atp_file_name = atp_file_path + "\\" + filename
 
-        apt_process = subprocess.Popen(
-            ["C:\\ATP\\atpdraw\\ATP\\solver.bat", atp_file_name],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.PIPE,
-        )
-        
-        apt_process.communicate()
-        readPL4(pl4_filename)
-        files_to_delete = []
-        try:
-            for file in ext:
-                files_to_delete.extend(glob(file))
-            for file in files_to_delete:
-                os.remove(file)
-        except:
-            pass
-        
-        t2 = time.perf_counter()
-        print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
+    apt_process = subprocess.Popen(
+        ["C:\\ATP\\atpdraw\\ATP\\solver.bat", atp_file_name],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,
+    )
+
+    apt_process.communicate()
+    readPL4(pl4_filename)
+    files_to_delete = []
+    try:
+        for file in ext:
+            files_to_delete.extend(glob(file))
+        for file in files_to_delete:
+            os.remove(file)
+    except:
+        pass
+
+    t2 = time.perf_counter()
+    print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
+
 
 # -------------------Ventana Principal----------#
 class MyWindow(QtWidgets.QMainWindow):
@@ -212,8 +207,6 @@ class MyWindow(QtWidgets.QMainWindow):
         self.IconLabel.hide()
         self.GenPage.hide()
         self.SetPage.hide()
-    
-    
 
     def ButtonPressed(self):
         button = self.sender().objectName()
@@ -438,10 +431,7 @@ class MyWindow(QtWidgets.QMainWindow):
                         d_mainSource = line_idx + 1
                     if "C microGridSource" in line.strip("\n"):
                         d_microGridSource = line_idx + 1
-                    
-                
-                
-                    
+
                 self.setgridop(d_lineswmr, lines_copy)
                 data_dict = {}
                 data_dict["Nodo"] = {}
@@ -466,24 +456,40 @@ class MyWindow(QtWidgets.QMainWindow):
                 lines_copy[d_lineA] = element_lineA[:26] + RF + element_lineA[32:]
                 lines_copy[d_lineB] = element_lineB[:26] + RF + element_lineB[32:]
                 lines_copy[d_lineC] = element_lineC[:26] + RF + element_lineC[32:]
-                
+
                 random_phase = True
                 if random_phase:
-                    phase_int = random.randint(0, 360)
+                    phase_int = random.randint(0, 180)
                     phase_dec = round(random.random(), 5)
                     source_phase = phase_int + phase_dec
+                    phi_a = str(round(source_phase, 5))
+                    phi_b = str(round(source_phase - 120, 5))
+                    phi_c = str(round(source_phase - 240, 5))
                     try:
-                        phase_line = lines_copy[d_mainSource]
-                        lines_copy[d_mainSource] = f"{phase_line[:30]}{str(round(source_phase, 5)):>10}{phase_line[40:]}"
-                        lines_copy[d_mainSource+1] = f"{phase_line[:30]}{str(round(source_phase-120,5)):>10}{phase_line[40:]}"
-                        lines_copy[d_mainSource+2] = f"{phase_line[:30]}{str(round(source_phase-240,5)):>10}{phase_line[40:]}"
+                        print("chkpoint phase")
+                        phase_line_a = lines_copy[d_mainSource]
+                        phase_line_b = lines_copy[d_mainSource + 1]
+                        phase_line_c = lines_copy[d_mainSource + 2]
+                        lines_copy[
+                            d_mainSource
+                        ] = f"{phase_line_a[:30]}{phi_a:>10}{phase_line_a[40:]}"
+                        lines_copy[
+                            d_mainSource + 1
+                        ] = f"{phase_line_b[:30]}{phi_b:>10}{phase_line_b[40:]}"
+                        lines_copy[
+                            d_mainSource + 2
+                        ] = f"{phase_line_c[:30]}{phi_c:>10}{phase_line_c[40:]}"
                     except NameError:
                         print("There is no source with mainSource in comment")
                     try:
                         phase_line = lines_copy[d_microGridSource]
-                        lines_copy[d_microGridSource] = f"{phase_line[:30]}{str(round(source_phase, 5)):>10}{phase_line[40:]}"
+                        lines_copy[
+                            d_microGridSource
+                        ] = f"{phase_line[:30]}{str(round(source_phase+0.17, 5)):>10}{phase_line[40:]}"
                     except NameError:
-                        print("There is no microgrid source with microGridSource in comment")
+                        print(
+                            "There is no microgrid source with microGridSource in comment"
+                        )
                 if Tipo_Falla == "01":
 
                     data_dict = {}
@@ -1108,7 +1114,6 @@ class MyWindow(QtWidgets.QMainWindow):
                     )
                     with open("SCENARIOS_ATP\\" + nombre, "w") as file:
                         file.writelines(lines_copy)
-    
 
     def ATP_files_execution(self):
         cores = os.cpu_count()
@@ -1116,15 +1121,21 @@ class MyWindow(QtWidgets.QMainWindow):
         solver = "C:\\ATP\\atpdraw\\ATP\\solver.bat"
         ext = ("SCENARIOS_ATP\\*.dbg", "SCENARIOS_ATP\\*.lis")
         filenames_gen = (
-            row.strip("\n") for row in open("Lista de fallas\\FileListATPFault.txt", "r")
+            row.strip("\n")
+            for row in open("Lista de fallas\\FileListATPFault.txt", "r")
         )
         t1_total = time.perf_counter()
         with concurrent.futures.ProcessPoolExecutor(max_workers=cores - 3) as executor:
-            executor.map(atp_run, filenames_gen, repeat(ext), repeat(current_directory), repeat(solver))
+            executor.map(
+                atp_run,
+                filenames_gen,
+                repeat(ext),
+                repeat(current_directory),
+                repeat(solver),
+            )
 
         t2_total = time.perf_counter()
         print(f"Tiempo de simulación total {round(t2_total-t1_total, 3)}s\n\n")
-
 
     # ---------Ventana de cargas---------------------#
     def executedyg(self, atp_file):
@@ -1355,19 +1366,14 @@ class MyWindow(QtWidgets.QMainWindow):
     # ----------------Datos de salida-------------------------------#
 
 
-
 def main():
     app = QtWidgets.QApplication(sys.argv)
     win = MyWindow()
     app.exec_()
-    
 
-    
+
 if __name__ == "__main__":
     main()
 
-    
 
-    
 # Project Designed by: Mildre Fernández and Daniela Latorre. 2021 #
-
