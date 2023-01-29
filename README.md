@@ -6,6 +6,8 @@ as a final project to obtain their Electrical Engineer title in Universidad el N
 
 ### Before Installation
 
+Make sure the directory where SEMSetup.bat is located is named /Instalador_SEM/
+
 Verify that solver.bat path in PFGUI.py correspond to path where solver is stored in local machine.
 Paths must match:
 1. PFGUI.py: lines 807, 847
