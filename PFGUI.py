@@ -12,6 +12,7 @@ import cmath
 import shutil
 import re
 import sys
+import random
 from subprocess import Popen, PIPE
 import subprocess
 import concurrent.futures
@@ -433,7 +434,14 @@ class MyWindow(QtWidgets.QMainWindow):
                         d_lineswmr = line_idx + 1
                     if "C " + "SMR1" == line.strip("\n"):
                         d_lineswmr = line_idx + 1
-
+                    if "C mainSource" in line.strip("\n"):
+                        d_mainSource = line_idx + 1
+                    if "C microGridSource" in line.strip("\n"):
+                        d_microGridSource = line_idx + 1
+                    
+                
+                
+                    
                 self.setgridop(d_lineswmr, lines_copy)
                 data_dict = {}
                 data_dict["Nodo"] = {}
@@ -458,7 +466,24 @@ class MyWindow(QtWidgets.QMainWindow):
                 lines_copy[d_lineA] = element_lineA[:26] + RF + element_lineA[32:]
                 lines_copy[d_lineB] = element_lineB[:26] + RF + element_lineB[32:]
                 lines_copy[d_lineC] = element_lineC[:26] + RF + element_lineC[32:]
-
+                
+                random_phase = True
+                if random_phase:
+                    phase_int = random.randint(0, 360)
+                    phase_dec = round(random.random(), 5)
+                    source_phase = phase_int + phase_dec
+                    try:
+                        phase_line = lines_copy[d_mainSource]
+                        lines_copy[d_mainSource] = f"{phase_line[:30]}{str(round(source_phase, 5)):>10}{phase_line[40:]}"
+                        lines_copy[d_mainSource+1] = f"{phase_line[:30]}{str(round(source_phase-120,5)):>10}{phase_line[40:]}"
+                        lines_copy[d_mainSource+2] = f"{phase_line[:30]}{str(round(source_phase-240,5)):>10}{phase_line[40:]}"
+                    except NameError:
+                        print("There is no source with mainSource in comment")
+                    try:
+                        phase_line = lines_copy[d_microGridSource]
+                        lines_copy[d_microGridSource] = f"{phase_line[:30]}{str(round(source_phase, 5)):>10}{phase_line[40:]}"
+                    except NameError:
+                        print("There is no microgrid source with microGridSource in comment")
                 if Tipo_Falla == "01":
 
                     data_dict = {}
