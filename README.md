@@ -55,6 +55,7 @@ Para ejecutar el programa, dentro del directorio /SEM/ creado, ejecute SEM.bat. 
 - [ ] Revisar la licencia del repo [readPL4](https://github.com/ldemattos/readPL4) y mencionar que se utilizó en la función readPL4() de PFGUI.py.
       Actualizar licencia acorde a lo anterior.
 - [ ] Crear un ejecutable de todo el programa. Por alguna razón al agreagar multiprocess, ya no compila correctamente un ejecutable.
+- [ ] Eliminar automáticamente los archivos .plt y .atp tras completadas las simulaciones (no son necesarios puesto que ya se tienen los CSV).
 
 #### Tener en cuenta
 
