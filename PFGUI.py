@@ -21,7 +21,15 @@ import time
 from glob import glob
 
 
-def readPL4(pl4file):
+def readPL4(pl4file: str):
+    """This function extracts signals from a PL4 file and saves
+    it as a CSV file.
+
+    Parameters
+    ----------
+    pl4file : str
+        Name of .pl4 file
+    """
     miscData = {"deltat": 0.0, "nvar": 0, "pl4size": 0, "steps": 0, "tmax": 0.0}
 
     with open("SCENARIOS_ATP\\" + pl4file, "rb") as f:
@@ -102,7 +110,20 @@ def readPL4(pl4file):
         final = time.time()
 
 
-def atp_run(filename, ext, current_directory, solver):
+def atp_run(filename: str, ext: str, current_directory: str, solver: str):
+    """Executes passed .atp file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of .atp extension file.
+    ext : str
+        Extension of temporal files to remove after the simulation is done.
+    current_directory : str
+        Path where script is being executed (results folder must be at the same level as PFGUI.py)
+    solver : str
+        Path to solver (.bat file) containing code to execute atp-emtp
+    """
 
     t1 = time.perf_counter()
 
