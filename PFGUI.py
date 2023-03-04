@@ -154,6 +154,25 @@ def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
     print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
 
 
+def fault_list_creator(checked_faults: list, bus_impedance_list: list, f):
+    """Writes events in FileListATPFault.txt
+
+    Parameters
+    ----------
+    checked_faults : list
+        List of indexes of checked faults
+    bus_impedance_list : list
+        List of combination of buses at fault and impedance values
+    f : _io.textiowrapper
+        _description_
+    """
+    for fault_idx in checked_faults:
+        for bus, z in bus_impedance_list:
+            f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
+            print(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
+            f.close
+
+
 # -------------------Ventana Principal----------#
 class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -310,69 +329,13 @@ class MyWindow(QtWidgets.QMainWindow):
             Rf = float(Rfin)
 
         impedances = np.around(np.arange(Ri, Rf + D, D), 5)
-        bus_impedance_gen = [(bus, z) for bus in buses for z in impedances]
-        for idx, checkbox in enumerate(fault_checkbox):
-            print(checkbox.isChecked())
-            if checkbox.isChecked():
-                for bus, z in bus_impedance_gen:
-                    f.write(f"Fault{idx+1:02}_B{bus}_RF{z}.atp\n")
-                    print(f"Fault{idx+1:02}_B{bus}_RF{z}.atp\n")
-                    f.close
-        # if self.Check01.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault01_B" + i + "_RF" + str(x) + ".atp\n")
-        #             f.close
-        # if self.Check02.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault02_B" + i + "_RF" + str(x) + ".atp\n")
-        #             f.close
-        # if self.Check03.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault03_B" + i + "_RF" + str(x) + ".atp\n")
-        #             f.close
-        # if self.Check04.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault04_B" + i + "_RF" + str(x) + ".atp\n")
-        #             f.close
-        # if self.Check05.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault05_B" + i + "_RF" + str(x) + ".atp\n")
-        #             f.close
-        # if self.Check06.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault06_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
-        # if self.Check07.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault07_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
-        # if self.Check08.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault08_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
-        # if self.Check09.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault09_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
-        # if self.Check10.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault10_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
-        # if self.Check11.isChecked() == True:
-        #     for i in buses:
-        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
-        #             f.write("Fault11_B" + i + "_RF" + str(x) + ".atp" "\n")
-        #             f.close
+        bus_impedance_list = [(bus, z) for bus in buses for z in impedances]
+        checked_faults = [
+            idx + 1
+            for idx, checkbox in enumerate(fault_checkbox)
+            if checkbox.isChecked()
+        ]
+        fault_list_creator(checked_faults, bus_impedance_list, f)
 
     def save_fault(self, fname):
         currentDirectory = os.getcwd()
