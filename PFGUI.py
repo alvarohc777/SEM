@@ -154,7 +154,7 @@ def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
     print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
 
 
-def fault_list_creator(checked_faults: list, bus_impedance_list: list, f):
+def fault_list_creator(checked_faults: list, bus_impedance_list: list):
     """Writes events in FileListATPFault.txt
 
     Parameters
@@ -166,6 +166,7 @@ def fault_list_creator(checked_faults: list, bus_impedance_list: list, f):
     f : _io.textiowrapper
         _description_
     """
+    f = open("Lista de fallas\\FileListATPFault.txt", mode="w+")
     for fault_idx in checked_faults:
         for bus, z in bus_impedance_list:
             f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
@@ -296,9 +297,8 @@ class MyWindow(QtWidgets.QMainWindow):
 
     # --------------- VENTANA DE FALLAS------------#
     def CheckBoxChangedAction(self):
-        f = open("Lista de fallas\\FileListATPFault.txt", mode="w+")
         buses = self.Bustext.toPlainText()
-        buses = buses.split(" ")
+        buses = buses.strip().split(" ")
         Rinic = self.Rinicial.toPlainText()
         Delta = self.Rpaso.toPlainText()
         Rfin = self.Rfinal.toPlainText()
@@ -329,13 +329,15 @@ class MyWindow(QtWidgets.QMainWindow):
             Rf = float(Rfin)
 
         impedances = np.around(np.arange(Ri, Rf + D, D), 5)
+        # Create list
         bus_impedance_list = [(bus, z) for bus in buses for z in impedances]
         checked_faults = [
             idx + 1
             for idx, checkbox in enumerate(fault_checkbox)
             if checkbox.isChecked()
         ]
-        fault_list_creator(checked_faults, bus_impedance_list, f)
+        # Create FileListATPFault.txt
+        fault_list_creator(checked_faults, bus_impedance_list)
 
     def save_fault(self, fname):
         currentDirectory = os.getcwd()
