@@ -23,7 +23,8 @@ from glob import glob
 
 def readPL4(pl4file: str):
     """This function extracts signals from a PL4 file and saves
-    it as a CSV file.
+    it as a CSV file. Function found at: https://github.com/ldemattos/readPL4.
+    'Describe and read ATP's (Alternative Transients Program) PL4 binary data file format by means of reverse engineering.'
 
     Parameters
     ----------
@@ -33,7 +34,6 @@ def readPL4(pl4file: str):
     miscData = {"deltat": 0.0, "nvar": 0, "pl4size": 0, "steps": 0, "tmax": 0.0}
 
     with open("SCENARIOS_ATP\\" + pl4file, "rb") as f:
-
         pl4 = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
 
         # Read DELTAT
@@ -110,14 +110,14 @@ def readPL4(pl4file: str):
         final = time.time()
 
 
-def atp_run(filename: str, ext: str, current_directory: str, solver: str):
+def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
     """Executes passed .atp file.
 
     Parameters
     ----------
     filename : str
         Name of .atp extension file.
-    ext : str
+    ext : tuple of str
         Extension of temporal files to remove after the simulation is done.
     current_directory : str
         Path where script is being executed (results folder must be at the same level as PFGUI.py)
@@ -309,61 +309,70 @@ class MyWindow(QtWidgets.QMainWindow):
             D = float(Delta)
             Rf = float(Rfin)
 
-        if self.Check01.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault01_B" + i + "_RF" + str(x) + ".atp\n")
+        impedances = np.around(np.arange(Ri, Rf + D, D), 5)
+        bus_impedance_gen = [(bus, z) for bus in buses for z in impedances]
+        for idx, checkbox in enumerate(fault_checkbox):
+            print(checkbox.isChecked())
+            if checkbox.isChecked():
+                for bus, z in bus_impedance_gen:
+                    f.write(f"Fault{idx+1:02}_B{bus}_RF{z}.atp\n")
+                    print(f"Fault{idx+1:02}_B{bus}_RF{z}.atp\n")
                     f.close
-        if self.Check02.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault02_B" + i + "_RF" + str(x) + ".atp\n")
-                    f.close
-        if self.Check03.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault03_B" + i + "_RF" + str(x) + ".atp\n")
-                    f.close
-        if self.Check04.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault04_B" + i + "_RF" + str(x) + ".atp\n")
-                    f.close
-        if self.Check05.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault05_B" + i + "_RF" + str(x) + ".atp\n")
-                    f.close
-        if self.Check06.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault06_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
-        if self.Check07.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault07_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
-        if self.Check08.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault08_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
-        if self.Check09.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault09_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
-        if self.Check10.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault10_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
-        if self.Check11.isChecked() == True:
-            for i in buses:
-                for x in np.around(np.arange(Ri, Rf + D, D), 5):
-                    f.write("Fault11_B" + i + "_RF" + str(x) + ".atp" "\n")
-                    f.close
+        # if self.Check01.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault01_B" + i + "_RF" + str(x) + ".atp\n")
+        #             f.close
+        # if self.Check02.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault02_B" + i + "_RF" + str(x) + ".atp\n")
+        #             f.close
+        # if self.Check03.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault03_B" + i + "_RF" + str(x) + ".atp\n")
+        #             f.close
+        # if self.Check04.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault04_B" + i + "_RF" + str(x) + ".atp\n")
+        #             f.close
+        # if self.Check05.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault05_B" + i + "_RF" + str(x) + ".atp\n")
+        #             f.close
+        # if self.Check06.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault06_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
+        # if self.Check07.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault07_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
+        # if self.Check08.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault08_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
+        # if self.Check09.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault09_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
+        # if self.Check10.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault10_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
+        # if self.Check11.isChecked() == True:
+        #     for i in buses:
+        #         for x in np.around(np.arange(Ri, Rf + D, D), 5):
+        #             f.write("Fault11_B" + i + "_RF" + str(x) + ".atp" "\n")
+        #             f.close
 
     def save_fault(self, fname):
         currentDirectory = os.getcwd()
@@ -512,7 +521,6 @@ class MyWindow(QtWidgets.QMainWindow):
                             "There is no microgrid source with microGridSource in comment"
                         )
                 if Tipo_Falla == "01":
-
                     data_dict = {}
                     data_dict["FaultSwA"] = {}
                     data_dict["FaultSwA"]["open_time"] = TFf
