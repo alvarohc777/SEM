@@ -324,6 +324,7 @@ class MyWindow(QtWidgets.QMainWindow):
             msgBox.setWindowIcon(QIcon("Images\\Uninorte.png"))
             msgBox.setWindowTitle("SEM")
             msgBox.exec_()
+            return
         else:
             Ri = float(Rinic)
             D = float(Delta)
