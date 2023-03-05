@@ -299,11 +299,12 @@ class MyWindow(QtWidgets.QMainWindow):
     def CheckBoxChangedAction(self):
         buses = self.Bustext.toPlainText()
         buses = buses.strip().split(" ")
-        Rinic = self.Rinicial.toPlainText()
-        Delta = self.Rpaso.toPlainText()
-        Rfin = self.Rfinal.toPlainText()
-        Tfallainicial = self.Tfallai.toPlainText()
-        TFallafinal = self.Tfallaf.toPlainText()
+        Rinic = self.Rinicial.toPlainText().strip()
+        Delta = self.Rpaso.toPlainText().strip()
+        print(f"delta: {Delta}")
+        Rfin = self.Rfinal.toPlainText().strip()
+        Tfallainicial = self.Tfallai.toPlainText().strip()
+        TFallafinal = self.Tfallaf.toPlainText().strip()
 
         if (
             len(buses) < 1
