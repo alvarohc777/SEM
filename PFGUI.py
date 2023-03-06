@@ -305,8 +305,13 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     print(
                         "There is no microgrid source with microGridSource in comment"
                     )
+
+            data_dict = {}
+            element_linesg = lines_copy[d_linesg]
+            element_lineA = lines_copy[d_lineA]
+            element_lineB = lines_copy[d_lineB]
+            element_lineC = lines_copy[d_lineC]
             if Tipo_Falla == "01":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
@@ -330,10 +335,7 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
+
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -366,7 +368,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "02":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = "-1"
                 data_dict["FaultSwA"]["close_time"] = "1000"
@@ -390,10 +391,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -423,8 +420,8 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 )
                 with open("SCENARIOS_ATP\\" + nombre, "w") as file:
                     file.writelines(lines_copy)
+
             if Tipo_Falla == "03":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = "-1"
                 data_dict["FaultSwA"]["close_time"] = "1000"
@@ -448,10 +445,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -483,7 +476,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "04":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
@@ -507,10 +499,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -542,7 +530,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "05":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = "-1"
                 data_dict["FaultSwA"]["close_time"] = "1000"
@@ -566,10 +553,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -601,7 +584,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "06":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
@@ -625,10 +607,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -660,7 +638,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "07":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
@@ -684,10 +661,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -719,7 +692,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "08":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = "-1"
                 data_dict["FaultSwA"]["close_time"] = "1000"
@@ -743,10 +715,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -778,7 +746,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "09":
-                data_dict = {}
                 data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
@@ -802,10 +769,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 optimeC = OpenTC.center(10)
                 cltimeB = CloseTB.center(10)
                 cltimeC = CloseTC.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -837,7 +800,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "10":
-                data_dict = {}
                 data_dict["FaultSw"] = {}
                 data_dict["FaultSw"]["open_time"] = TFf
                 data_dict["FaultSw"]["close_time"] = TFi
@@ -852,10 +814,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 cltime = Closet.center(10)
                 optimeg = Opswg.center(10)
                 cltimeg = Clswg.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
@@ -887,7 +845,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                     file.writelines(lines_copy)
 
             if Tipo_Falla == "11":
-                data_dict = {}
                 data_dict["FaultSw"] = {}
                 data_dict["FaultSw"]["open_time"] = TFf
                 data_dict["FaultSw"]["close_time"] = TFi
@@ -895,10 +852,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 Closet = data_dict["FaultSw"]["close_time"]
                 optime = Opent.center(10)
                 cltime = Closet.center(10)
-                element_linesg = lines_copy[d_linesg]
-                element_lineA = lines_copy[d_lineA]
-                element_lineB = lines_copy[d_lineB]
-                element_lineC = lines_copy[d_lineC]
                 lines_copy[d_lineSA] = (
                     element_lineSA[:2]
                     + BusA
