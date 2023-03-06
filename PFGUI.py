@@ -170,13 +170,11 @@ def fault_list_creator(checked_faults: list, bus_impedance_list: list):
     for fault_idx in checked_faults:
         for bus, z in bus_impedance_list:
             f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
-            print(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
             f.close
 
 
 def setgridop(d_lineswmr, lines_copy, grid_checked):
     if grid_checked == True:
-        print("grid True")
         data_dict = {}
         data_dict["SMR"] = {}
         data_dict["SMR"]["close_time"] = "-1"
@@ -284,7 +282,6 @@ def atp_fault_file(TFf, TFi, grid_checked):
                 phi_b = str(round(source_phase - 120, 5))
                 phi_c = str(round(source_phase - 240, 5))
                 try:
-                    print("chkpoint phase")
                     phase_line_a = lines_copy[d_mainSource]
                     phase_line_b = lines_copy[d_mainSource + 1]
                     phase_line_c = lines_copy[d_mainSource + 2]
@@ -1060,7 +1057,6 @@ class MyWindow(QtWidgets.QMainWindow):
         buses = buses.strip().split(" ")
         Rinic = self.Rinicial.toPlainText().strip()
         Delta = self.Rpaso.toPlainText().strip()
-        print(f"delta: {Delta}")
         Rfin = self.Rfinal.toPlainText().strip()
         Tfallainicial = self.Tfallai.toPlainText().strip()
         TFallafinal = self.Tfallaf.toPlainText().strip()
