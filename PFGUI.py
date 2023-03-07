@@ -311,576 +311,142 @@ def atp_fault_file(TFf, TFi, grid_checked):
             element_lineA = lines_copy[d_lineA]
             element_lineB = lines_copy[d_lineB]
             element_lineC = lines_copy[d_lineC]
+
+            # Empty Switches parameters dictionary
+            data_dict["FaultSwA"] = {}
+            data_dict["FaultSwB"] = {}
+            data_dict["FaultSwC"] = {}
+            data_dict["FaultSwG"] = {}
+
+            # Default Switches Settings
+            data_dict["FaultSwA"]["close_time"] = "1000"
+            data_dict["FaultSwA"]["open_time"] = "-1"
+            data_dict["FaultSwB"]["close_time"] = "1000"
+            data_dict["FaultSwB"]["open_time"] = "-1"
+            data_dict["FaultSwC"]["close_time"] = "1000"
+            data_dict["FaultSwC"]["open_time"] = "-1"
+            data_dict["FaultSwG"]["close_time"] = "1000"
+            data_dict["FaultSwG"]["open_time"] = "-1"
+
             if Tipo_Falla == "01":
-                data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = "1000"
-                data_dict["FaultSwB"]["open_time"] = "-1"
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = "1000"
-                data_dict["FaultSwC"]["open_time"] = "-1"
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwA"]["open_time"]
-                Clswg = data_dict["FaultSwA"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeA + optimeA + element_linesg[34:]
-                )
-
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "02":
-                data_dict["FaultSwA"] = {}
-                data_dict["FaultSwA"]["open_time"] = "-1"
-                data_dict["FaultSwA"]["close_time"] = "1000"
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwB"]["open_time"] = TFf
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = "1000"
-                data_dict["FaultSwC"]["open_time"] = "-1"
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwB"]["open_time"]
-                Clswg = data_dict["FaultSwB"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeB + optimeB + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwB"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "03":
-                data_dict["FaultSwA"] = {}
-                data_dict["FaultSwA"]["open_time"] = "-1"
-                data_dict["FaultSwA"]["close_time"] = "1000"
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = "1000"
-                data_dict["FaultSwB"]["open_time"] = "-1"
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = TFi
                 data_dict["FaultSwC"]["open_time"] = TFf
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeC + optimeC + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "04":
-                data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwB"]["open_time"] = TFf
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = "1000"
-                data_dict["FaultSwC"]["open_time"] = "-1"
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeC + optimeC + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwB"]["close_time"] = TFi
 
             if Tipo_Falla == "05":
-                data_dict["FaultSwA"] = {}
-                data_dict["FaultSwA"]["open_time"] = "-1"
-                data_dict["FaultSwA"]["close_time"] = "1000"
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwB"]["open_time"] = TFf
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwC"]["open_time"] = TFf
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeA + optimeA + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwC"]["close_time"] = TFi
 
             if Tipo_Falla == "06":
-                data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = "1000"
-                data_dict["FaultSwB"]["open_time"] = "-1"
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = TFi
                 data_dict["FaultSwC"]["open_time"] = TFf
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeB + optimeB + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwC"]["close_time"] = TFi
 
             if Tipo_Falla == "07":
-                data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwB"]["open_time"] = TFf
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = "1000"
-                data_dict["FaultSwC"]["open_time"] = "-1"
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeA + optimeA + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwB"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "08":
-                data_dict["FaultSwA"] = {}
-                data_dict["FaultSwA"]["open_time"] = "-1"
-                data_dict["FaultSwA"]["close_time"] = "1000"
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwB"]["open_time"] = TFf
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwB"]["close_time"] = TFi
                 data_dict["FaultSwC"]["open_time"] = TFf
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeC + optimeC + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "09":
-                data_dict["FaultSwA"] = {}
                 data_dict["FaultSwA"]["open_time"] = TFf
                 data_dict["FaultSwA"]["close_time"] = TFi
-                data_dict["FaultSwB"] = {}
-                data_dict["FaultSwB"]["close_time"] = "1000"
-                data_dict["FaultSwB"]["open_time"] = "-1"
-                data_dict["FaultSwC"] = {}
-                data_dict["FaultSwC"]["close_time"] = TFi
                 data_dict["FaultSwC"]["open_time"] = TFf
-                OpenTA = data_dict["FaultSwA"]["open_time"]
-                CloseTA = data_dict["FaultSwA"]["close_time"]
-                OpenTB = data_dict["FaultSwB"]["open_time"]
-                CloseTB = data_dict["FaultSwB"]["close_time"]
-                OpenTC = data_dict["FaultSwC"]["open_time"]
-                CloseTC = data_dict["FaultSwC"]["close_time"]
-                Opswg = data_dict["FaultSwC"]["open_time"]
-                Clswg = data_dict["FaultSwC"]["close_time"]
-                optimeA = OpenTA.center(10)
-                cltimeA = CloseTA.center(10)
-                optimeB = OpenTB.center(10)
-                optimeC = OpenTC.center(10)
-                cltimeB = CloseTB.center(10)
-                cltimeC = CloseTC.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltimeA
-                    + optimeA
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltimeB
-                    + optimeB
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltimeC
-                    + optimeC
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeC + optimeC + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
 
             if Tipo_Falla == "10":
-                data_dict["FaultSw"] = {}
-                data_dict["FaultSw"]["open_time"] = TFf
-                data_dict["FaultSw"]["close_time"] = TFi
-                data_dict["FaultSwG"] = {}
-                data_dict["FaultSwG"]["close_time"] = "1000"
-                data_dict["FaultSwG"]["open_time"] = "-1"
-                Opent = data_dict["FaultSw"]["open_time"]
-                Closet = data_dict["FaultSw"]["close_time"]
-                Opswg = data_dict["FaultSwG"]["open_time"]
-                Clswg = data_dict["FaultSwG"]["close_time"]
-                optime = Opent.center(10)
-                cltime = Closet.center(10)
-                optimeg = Opswg.center(10)
-                cltimeg = Clswg.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltimeg + optimeg + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwA"]["open_time"] = TFf
+                data_dict["FaultSwA"]["close_time"] = TFi
+                data_dict["FaultSwB"]["open_time"] = TFf
+                data_dict["FaultSwB"]["close_time"] = TFi
+                data_dict["FaultSwC"]["open_time"] = TFf
+                data_dict["FaultSwC"]["close_time"] = TFi
 
             if Tipo_Falla == "11":
-                data_dict["FaultSw"] = {}
-                data_dict["FaultSw"]["open_time"] = TFf
-                data_dict["FaultSw"]["close_time"] = TFi
-                Opent = data_dict["FaultSw"]["open_time"]
-                Closet = data_dict["FaultSw"]["close_time"]
-                optime = Opent.center(10)
-                cltime = Closet.center(10)
-                lines_copy[d_lineSA] = (
-                    element_lineSA[:2]
-                    + BusA
-                    + element_lineSA[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSA[34:]
-                )
-                lines_copy[d_lineSB] = (
-                    element_lineSB[:2]
-                    + BusB
-                    + element_lineSB[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSB[34:]
-                )
-                lines_copy[d_lineSC] = (
-                    element_lineSC[:2]
-                    + BusC
-                    + element_lineSC[8:14]
-                    + cltime
-                    + optime
-                    + element_lineSC[34:]
-                )
-                lines_copy[d_linesg] = (
-                    element_linesg[:14] + cltime + optime + element_linesg[34:]
-                )
-                with open("SCENARIOS_ATP\\" + nombre, "w") as file:
-                    file.writelines(lines_copy)
+                data_dict["FaultSwA"]["open_time"] = TFf
+                data_dict["FaultSwA"]["close_time"] = TFi
+                data_dict["FaultSwB"]["open_time"] = TFf
+                data_dict["FaultSwB"]["close_time"] = TFi
+                data_dict["FaultSwC"]["open_time"] = TFf
+                data_dict["FaultSwC"]["close_time"] = TFi
+                data_dict["FaultSwG"]["open_time"] = TFf
+                data_dict["FaultSwG"]["close_time"] = TFi
+
+            open_time_A = data_dict["FaultSwA"]["open_time"].center(10)
+            close_time_A = data_dict["FaultSwA"]["close_time"].center(10)
+            open_time_B = data_dict["FaultSwB"]["open_time"].center(10)
+            close_time_B = data_dict["FaultSwB"]["close_time"].center(10)
+            open_time_C = data_dict["FaultSwC"]["open_time"].center(10)
+            close_time_C = data_dict["FaultSwC"]["close_time"].center(10)
+            open_time_gnd = data_dict["FaultSwG"]["open_time"].center(10)
+            close_time_gnd = data_dict["FaultSwG"]["close_time"].center(10)
+
+            lines_copy[d_lineSA] = (
+                element_lineSA[:2]
+                + BusA
+                + element_lineSA[8:14]
+                + close_time_A
+                + open_time_A
+                + element_lineSA[34:]
+            )
+            lines_copy[d_lineSB] = (
+                element_lineSB[:2]
+                + BusB
+                + element_lineSB[8:14]
+                + close_time_B
+                + open_time_B
+                + element_lineSB[34:]
+            )
+            lines_copy[d_lineSC] = (
+                element_lineSC[:2]
+                + BusC
+                + element_lineSC[8:14]
+                + close_time_C
+                + open_time_C
+                + element_lineSC[34:]
+            )
+            lines_copy[d_linesg] = (
+                element_linesg[:14]
+                + close_time_gnd
+                + open_time_gnd
+                + element_linesg[34:]
+            )
+            with open("SCENARIOS_ATP\\" + nombre, "w") as file:
+                file.writelines(lines_copy)
 
 
 # -------------------Ventana Principal----------#
@@ -976,10 +542,10 @@ class MyWindow(QtWidgets.QMainWindow):
             # Rfin = self.Rfinal.setPlainText(str(0.1))
             # Tfallainicial = self.Tfallai.setPlainText(str(0.05))
             # Tfallafinal = self.Tfallaf.setPlainText(str(.1))
-            buses = self.Bustext.setPlainText(str(632))
+            buses = self.Bustext.setPlainText(str(802))
             Rinic = self.Rinicial.setPlainText(str(0.00001))
-            Delta = self.Rpaso.setPlainText(str(0.00001))
-            Rfin = self.Rfinal.setPlainText(str(0.00002))
+            Delta = self.Rpaso.setPlainText(str(20))
+            Rfin = self.Rfinal.setPlainText(str(40))
             Tfallainicial = self.Tfallai.setPlainText(str(0.05))
             Tfallafinal = self.Tfallaf.setPlainText(str(0.1))
 
