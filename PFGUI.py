@@ -173,7 +173,23 @@ def fault_list_creator(checked_faults: list, bus_impedance_list: list):
             f.close
 
 
-def setgridop(d_lineswmr, lines_copy, grid_checked):
+def setgridop(d_lineswmr: int, lines_copy: list, grid_checked: bool):
+    """Sets microgrid switch state (closed or open)
+
+    Parameters
+    ----------
+    d_lineswmr : int
+        Index of line containing information of microgrid switch
+    lines_copy : list
+        List containing all lines of atp file.
+    grid_checked : bool
+        Whether microgrid switch is closed or open
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     if grid_checked == True:
         data_dict = {}
         data_dict["SMR"] = {}
@@ -207,7 +223,27 @@ def setgridop(d_lineswmr, lines_copy, grid_checked):
     return lines_copy
 
 
-def atp_fault_file(TFf, TFi, grid_checked):
+def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
+    """This function updates each ATP card's (all cloned from model scenario)
+    internal values according to their name. Each name bus at fault, fault type
+    and fault resistance.
+
+    Format: FaultXX_BXXX_RFXX.atp.
+
+    Where
+        FaultXX -> Fault type.
+        BXXX    -> Bus at fault.
+        RFXX    -> Fault resistance.
+
+    Parameters
+    ----------
+    TFf : str
+        Fault final time
+    TFi : str
+        Fault initial time
+    grid_checked : bool
+        Microgrid Switch State (True: microgrid on / False: microgrid off)
+    """
     with open("Lista de fallas\\FileListATPFault.txt", "r") as f:
         for atp_file_name in f:
             # Get parameters from file
