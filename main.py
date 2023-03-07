@@ -23,21 +23,21 @@ import re
 import random
 
 
-def fault_list_creator(checked_faults: list, bus_impedance_list: list):
+def fault_list_creator(checked_faults: list, bus_impedance: list):
     """Writes events in FileListATPFault.txt
 
     Parameters
     ----------
     checked_faults : list
         List of indexes of checked faults
-    bus_impedance_list : list
+    bus_impedance : list
         List of combination of buses at fault and impedance values
     f : _io.textiowrapper
         _description_
     """
     f = open("Lista de fallas\\FileListATPFault.txt", mode="w+")
     for fault_idx in checked_faults:
-        for bus, z in bus_impedance_list:
+        for bus, z in bus_impedance:
             f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
             f.close
 
@@ -495,37 +495,6 @@ def fault_inputs():
         802,
         814,
         832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
-        802,
-        814,
-        832,
     ]
     Ri = 0.00001
     Rf = 100
@@ -545,7 +514,7 @@ def fault_inputs():
     }
 
     # Save params in dictionary
-    params["buses"] = buses
+    params["buses"] = list(set(buses))
     params["Ri"] = Ri
     params["Rf"] = Rf
     params["R_step"] = R_step
@@ -567,14 +536,15 @@ def main():
         R_step = params["R_step"]
         faults_checkbox = params["faults_checkbox"]
 
+        # Create Bus-Impedance Combinations List
         impedances = np.around(np.arange(Ri, Rf + R_step, R_step), 5)
         bus_impedance = [(bus, z) for bus in buses for z in impedances]
-        bus_impedance_gen = ((bus, z) for bus in buses for z in impedances)
+        bus_impedance = ((bus, z) for bus in buses for z in impedances)
+        # Create Desired faults list
         checked_faults = [
             idx + 1 for idx, state in enumerate(faults_checkbox.values()) if state
         ]
-        print(sys.getsizeof(bus_impedance))
-        print(sys.getsizeof(bus_impedance_gen))
+        fault_list_creator(checked_faults, bus_impedance)
     elif params["event"] == "load":
         print("función no disponible aún")
 
