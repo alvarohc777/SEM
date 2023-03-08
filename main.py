@@ -14,7 +14,7 @@ import time
 import subprocess
 import glob
 import os
-import sys
+import shutil
 
 # To find patterns
 import re
@@ -487,30 +487,58 @@ def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
     print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
 
 
-def fault_inputs():
+def create_copies(base_file_path: str):
+    cwd = os.getcwd()
+    with open(r"Lista de fallas\FileListATPFault.txt", mode="r") as f:
+        shutil.rmtree(f"{cwd}\SCENARIOS_ATP")
+        os.mkdir("SCENARIOS_ATP")
+        for line in f:
+            new_name = line.strip("\n")
+            target = f"{cwd}\SCENARIOS_ATP\{new_name}"
+            shutil.copy(base_file_path, target)
+
+
+def fault_inputs() -> dict:
+    """Function to receive all simulation parameters inputs
+
+    Returns
+    -------
+    dict
+        Dictionary with simulations parameters
+    """
     params = {}
 
     # Validate or transform data
+    base_file_path = (
+        r"C:\Users\aherrada\Documents\GIT\SEM\Sistemas de prueba\IEEE34_form1.atp"
+    )
+    # "C:/Users/aherrada/Documents/GIT/SEM/SCENARIOS_ATP/IEEE34_form1.atp"
+
     buses = [
         802,
         814,
         832,
     ]
     Ri = 0.00001
-    Rf = 100
-    R_step = 10
+    Rf = 20
+    R_step = 20
+
+    ti = 0.05
+    tf = 0.1
+    grid_state = True
+
     faults_checkbox = {
         "fault01": True,
-        "fault02": False,
-        "fault03": True,
-        "fault04": True,
-        "fault05": True,
-        "fault06": True,
+        "fault02": True,
+        "fault03": False,
+        "fault04": False,
+        "fault05": False,
+        "fault06": False,
         "fault07": False,
-        "fault08": True,
+        "fault08": False,
         "fault09": False,
-        "fault10": True,
-        "fault11": True,
+        "fault10": False,
+        "fault11": False,
     }
 
     # Save params in dictionary
@@ -520,6 +548,12 @@ def fault_inputs():
     params["R_step"] = R_step
     params["event"] = "fault"
     params["faults_checkbox"] = faults_checkbox
+
+    params["ti"] = ti
+    params["tf"] = tf
+    params["grid_state"] = grid_state
+
+    params["base_file_path"] = base_file_path
     return params
 
 
@@ -539,12 +573,20 @@ def main():
         # Create Bus-Impedance Combinations List
         impedances = np.around(np.arange(Ri, Rf + R_step, R_step), 5)
         bus_impedance = [(bus, z) for bus in buses for z in impedances]
-        bus_impedance = ((bus, z) for bus in buses for z in impedances)
         # Create Desired faults list
         checked_faults = [
             idx + 1 for idx, state in enumerate(faults_checkbox.values()) if state
         ]
+
+        # Check if at least 1 event is selected
+        if not (len(checked_faults) > 0):
+            print("No hay fallas")
+
+        # print(len(checked_faults))
         fault_list_creator(checked_faults, bus_impedance)
+
+        create_copies(params["base_file_path"])
+
     elif params["event"] == "load":
         print("función no disponible aún")
 
