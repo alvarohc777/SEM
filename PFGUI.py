@@ -163,8 +163,6 @@ def fault_list_creator(checked_faults: list, bus_impedance_list: list):
         List of indexes of checked faults
     bus_impedance_list : list
         List of combination of buses at fault and impedance values
-    f : _io.textiowrapper
-        _description_
     """
     f = open("Lista de fallas\\FileListATPFault.txt", mode="w+")
     for fault_idx in checked_faults:
