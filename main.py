@@ -30,6 +30,7 @@ import concurrent.futures
 EVENTS_DIR = "1. Events list"
 SCENARIOS_DIR = "2. Scenarios"
 CSV_DIR = "3. Archivos CSV"
+BASE_FILES_DIR = "Sistemas de prueba"
 FAULT_FILES_LIST = "fault_files_list.txt"
 
 
@@ -555,10 +556,7 @@ def fault_inputs() -> dict:
     params = {}
 
     # Validate or transform data
-    base_file_path = (
-        r"C:\Users\aherrada\Documents\GIT\SEM\Sistemas de prueba\IEEE34_form1.atp"
-    )
-    # "C:/Users/aherrada/Documents/GIT/SEM/SCENARIOS_ATP/IEEE34_form1.atp"
+    base_file_path = f"{CWD}\{BASE_FILES_DIR}\IEEE34_form1.atp"
 
     buses = [
         802,
