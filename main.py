@@ -22,9 +22,28 @@ import re
 # Other
 import random
 
+# Global Variables ()
+EVENTS_DIR = "Events list"
+SCENARIOS_DIR = "Scenarios"
+FAULT_FILES_LIST = "fault_files_list.txt"
+
+CWD = os.getcwd()
+
+
+def create_directories():
+    # Create new events lists directory -> fault_list_
+    if os.path.exists(EVENTS_DIR):
+        shutil.rmtree(EVENTS_DIR)
+    os.mkdir(EVENTS_DIR)
+
+    # Create new atp scenarios directory -> create_copies()
+    if os.path.exists(SCENARIOS_DIR):
+        shutil.rmtree(SCENARIOS_DIR)
+    os.mkdir(SCENARIOS_DIR)
+
 
 def fault_list_creator(checked_faults: list, bus_impedance: list):
-    """Writes events in FileListATPFault.txt
+    """Writes events list in {}FileListATPFault.txt
 
     Parameters
     ----------
@@ -32,14 +51,29 @@ def fault_list_creator(checked_faults: list, bus_impedance: list):
         List of indexes of checked faults
     bus_impedance : list
         List of combination of buses at fault and impedance values
-    f : _io.textiowrapper
-        _description_
     """
-    f = open("Lista de fallas\\FileListATPFault.txt", mode="w+")
+
+    f = open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", mode="w+")
     for fault_idx in checked_faults:
         for bus, z in bus_impedance:
             f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
             f.close
+
+
+def create_copies(base_file_path: str):
+    """Creates copies of base atp file in {SCENARIOS_DIR} directory
+    with updated names (according to simulation parameters)
+
+    Parameters
+    ----------
+    base_file_path : str
+        Base atp file.
+    """
+    with open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", mode="r") as f:
+        for line in f:
+            new_name = line.strip("\n")
+            target = f"{CWD}\{SCENARIOS_DIR}\{new_name}"
+            shutil.copy(base_file_path, target)
 
 
 def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
@@ -63,7 +97,7 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
     grid_checked : bool
         Microgrid Switch State (True: microgrid on / False: microgrid off)
     """
-    with open("Lista de fallas\\FileListATPFault.txt", "r") as f:
+    with open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", "r") as f:
         for atp_file_name in f:
             # Get parameters from file
             nombre = atp_file_name.rstrip("\n")
@@ -75,7 +109,7 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
             bus = re.search(pattern_bus_name, nombre).group(1)
 
             # Open file and read lines
-            with open("SCENARIOS_ATP\\" + nombre) as fatp:
+            with open(f"{SCENARIOS_DIR}\{nombre}") as fatp:
                 lines = fatp.readlines()
             lines_copy = lines.copy()
             val = True
@@ -300,7 +334,7 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
                 + open_time_gnd
                 + element_linesg[34:]
             )
-            with open("SCENARIOS_ATP\\" + nombre, "w") as file:
+            with open(f"{SCENARIOS_DIR}\{nombre}", "w") as file:
                 file.writelines(lines_copy)
 
 
@@ -487,17 +521,6 @@ def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
     print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
 
 
-def create_copies(base_file_path: str):
-    cwd = os.getcwd()
-    with open(r"Lista de fallas\FileListATPFault.txt", mode="r") as f:
-        shutil.rmtree(f"{cwd}\SCENARIOS_ATP")
-        os.mkdir("SCENARIOS_ATP")
-        for line in f:
-            new_name = line.strip("\n")
-            target = f"{cwd}\SCENARIOS_ATP\{new_name}"
-            shutil.copy(base_file_path, target)
-
-
 def fault_inputs() -> dict:
     """Function to receive all simulation parameters inputs
 
@@ -525,7 +548,7 @@ def fault_inputs() -> dict:
 
     ti = 0.05
     tf = 0.1
-    grid_state = True
+    microgrid_state = True
 
     faults_checkbox = {
         "fault01": True,
@@ -551,7 +574,7 @@ def fault_inputs() -> dict:
 
     params["ti"] = ti
     params["tf"] = tf
-    params["grid_state"] = grid_state
+    params["microgrid_state"] = microgrid_state
 
     params["base_file_path"] = base_file_path
     return params
@@ -581,11 +604,16 @@ def main():
         # Check if at least 1 event is selected
         if not (len(checked_faults) > 0):
             print("No hay fallas")
+            return
 
-        # print(len(checked_faults))
         fault_list_creator(checked_faults, bus_impedance)
 
         create_copies(params["base_file_path"])
+
+        ti = params["ti"]
+        tf = params["tf"]
+        microgrid_state = params["microgrid_state"]
+        atp_fault_file(str(tf), str(ti), microgrid_state)
 
     elif params["event"] == "load":
         print("función no disponible aún")
@@ -593,4 +621,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print(__name__)
