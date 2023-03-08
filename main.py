@@ -20,13 +20,19 @@ import shutil
 import re
 
 # Other
+from itertools import repeat
 import random
+
+
+# Multiprocessing
+import concurrent.futures
 
 # Global Variables ()
 EVENTS_DIR = "Events list"
 SCENARIOS_DIR = "Scenarios"
 FAULT_FILES_LIST = "fault_files_list.txt"
-
+SOLVER = "C:\\ATP\\atpdraw\\ATP\\solver.bat"
+EXT = (f"{SCENARIOS_DIR}\*.dbg", f"{SCENARIOS_DIR}\*.lis")
 CWD = os.getcwd()
 
 
@@ -388,6 +394,58 @@ def setgridop(d_lineswmr: int, lines_copy: list, grid_checked: bool):
     return lines_copy
 
 
+def atp_files_execution():
+    """Initiates parallel execution for each file"""
+    cores = os.cpu_count()
+    filenames_gen = (
+        row.strip("\n") for row in open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", "r")
+    )
+    t1_total = time.perf_counter()
+    with concurrent.futures.ProcessPoolExecutor(max_workers=cores - 3) as executor:
+        executor.map(atp_run, filenames_gen)
+    t2_total = time.perf_counter()
+    print(f"Tiempo de simulación total: {round(t2_total-t1_total, 3)}s\n\n")
+
+
+def atp_run(filename: str):
+    """Executes passed .atp file.
+
+    Parameters
+    ----------
+    filename : str
+        Name of .atp extension file.
+    """
+
+    t1 = time.perf_counter()
+
+    pl4_filename = filename.replace(".atp", ".pl4")
+    print(f"Iniciando {filename}")
+    atp_file_path = f"{CWD}\{SCENARIOS_DIR}"
+    atp_file_name = f"{atp_file_path}\{filename}"
+
+    apt_process = subprocess.Popen(
+        [SOLVER, atp_file_name],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,
+    )
+
+    apt_process.communicate()
+    # readPL4(pl4_filename)
+    files_to_delete = []
+
+    try:
+        for file in EXT:
+            files_to_delete.extend(glob(file))
+        for file in files_to_delete:
+            os.remove(file)
+    except:
+        pass
+
+    t2 = time.perf_counter()
+    print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
+
+
 def readPL4(pl4file: str):
     """This function extracts signals from a PL4 file and saves
     it as a CSV file. Function found at: https://github.com/ldemattos/readPL4.
@@ -475,50 +533,6 @@ def readPL4(pl4file: str):
         csv_name = csv_path + "\\" + archivopl4.split(".")[0] + ".csv"
         data.to_csv(csv_name, sep=";", index=False)
         final = time.time()
-
-
-def atp_run(filename: str, ext: tuple, current_directory: str, solver: str):
-    """Executes passed .atp file.
-
-    Parameters
-    ----------
-    filename : str
-        Name of .atp extension file.
-    ext : tuple of str
-        Extension of temporal files to remove after the simulation is done.
-    current_directory : str
-        Path where script is being executed (results folder must be at the same level as PFGUI.py)
-    solver : str
-        Path to solver (.bat file) containing code to execute atp-emtp
-    """
-
-    t1 = time.perf_counter()
-
-    pl4_filename = filename.replace(".atp", ".pl4")
-    print(f"Iniciando {filename}")
-    atp_file_path = current_directory + "\\SCENARIOS_ATP"
-    atp_file_name = atp_file_path + "\\" + filename
-
-    apt_process = subprocess.Popen(
-        ["C:\\ATP\\atpdraw\\ATP\\solver.bat", atp_file_name],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        stdin=subprocess.PIPE,
-    )
-
-    apt_process.communicate()
-    readPL4(pl4_filename)
-    files_to_delete = []
-    try:
-        for file in ext:
-            files_to_delete.extend(glob(file))
-        for file in files_to_delete:
-            os.remove(file)
-    except:
-        pass
-
-    t2 = time.perf_counter()
-    print(f"Terminó {filename} en {round(t2-t1, 3)}(s)")
 
 
 def fault_inputs() -> dict:
@@ -614,6 +628,8 @@ def main():
         tf = params["tf"]
         microgrid_state = params["microgrid_state"]
         atp_fault_file(str(tf), str(ti), microgrid_state)
+
+        atp_files_execution()
 
     elif params["event"] == "load":
         print("función no disponible aún")
