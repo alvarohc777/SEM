@@ -318,36 +318,18 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
             open_time_gnd = data_dict["FaultSwG"]["open_time"].center(10)
             close_time_gnd = data_dict["FaultSwG"]["close_time"].center(10)
 
-            lines_copy[d_lineSA] = (
-                element_lineSA[:2]
-                + BusA
-                + element_lineSA[8:14]
-                + close_time_A
-                + open_time_A
-                + element_lineSA[34:]
-            )
-            lines_copy[d_lineSB] = (
-                element_lineSB[:2]
-                + BusB
-                + element_lineSB[8:14]
-                + close_time_B
-                + open_time_B
-                + element_lineSB[34:]
-            )
-            lines_copy[d_lineSC] = (
-                element_lineSC[:2]
-                + BusC
-                + element_lineSC[8:14]
-                + close_time_C
-                + open_time_C
-                + element_lineSC[34:]
-            )
-            lines_copy[d_linesg] = (
-                element_linesg[:14]
-                + close_time_gnd
-                + open_time_gnd
-                + element_linesg[34:]
-            )
+            lines_copy[
+                d_lineSA
+            ] = f"{element_lineSA[:2]}{BusA}{element_lineSA[8:14]}{close_time_A}{open_time_A}{element_lineSA[34:]}"
+            lines_copy[
+                d_lineSB
+            ] = f"{element_lineSB[:2]}{BusB}{element_lineSB[8:14]}{close_time_B}{open_time_B}{element_lineSB[34:]}"
+            lines_copy[
+                d_lineSC
+            ] = f"{element_lineSC[:2]}{BusC}{element_lineSC[8:14]}{close_time_C}{open_time_C}{element_lineSC[34:]}"
+            lines_copy[
+                d_linesg
+            ] = f"{element_linesg[:14]}{close_time_gnd}{open_time_gnd}{element_linesg[34:]}"
             with open(f"{SCENARIOS_DIR}\{nombre}", "w") as file:
                 file.writelines(lines_copy)
 
