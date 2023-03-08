@@ -2,7 +2,6 @@
 import struct
 import mmap
 
-
 # NumPy Stack
 import pandas as pd
 import numpy as np
@@ -23,15 +22,14 @@ import re
 from itertools import repeat
 import random
 
-
 # Multiprocessing
 import concurrent.futures
 
-# Global Variables
+# Global Constants
 
-EVENTS_DIR = "Events list"
-SCENARIOS_DIR = "Scenarios"
-CSV_DIR = "Archivos CSV"
+EVENTS_DIR = "1. Events list"
+SCENARIOS_DIR = "2. Scenarios"
+CSV_DIR = "3. Archivos CSV"
 FAULT_FILES_LIST = "fault_files_list.txt"
 
 
@@ -51,7 +49,7 @@ def create_directories():
         shutil.rmtree(SCENARIOS_DIR)
     os.mkdir(SCENARIOS_DIR)
 
-    # Create new atp scenarios directory -> create_copies()
+    # # Create new atp scenarios directory -> create_copies()
     if os.path.exists(CSV_DIR):
         shutil.rmtree(CSV_DIR)
     os.mkdir(CSV_DIR)
@@ -129,27 +127,27 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
             lines_copy = lines.copy()
             val = True
             for line_idx, line in enumerate(lines):
-                if "C " + "RFA" == line.strip("\n"):
+                if "C RFA" in line:
                     d_lineA = line_idx + 1
-                if "C " + "RFB" == line.strip("\n"):
+                if "C RFB" in line:
                     d_lineB = line_idx + 1
-                if "C " + "RFC" == line.strip("\n"):
+                if "C RFC" in line:
                     d_lineC = line_idx + 1
-                if "C " + "FaultSwA" == line.strip("\n"):
+                if "C FaultSwA" in line:
                     d_lineSA = line_idx + 1
-                if "C " + "FaultSwB" == line.strip("\n"):
+                if "C FaultSwB" in line:
                     d_lineSB = line_idx + 1
-                if "C " + "FaultSwC" == line.strip("\n"):
+                if "C FaultSwC" in line:
                     d_lineSC = line_idx + 1
-                if "C " + "FaultSwGround" == line.strip("\n"):
+                if "C FaultSwGround" in line:
                     d_linesg = line_idx + 1
-                if "C " + "SMR2" == line.strip("\n"):
+                if "C SMR2" in line:
                     d_lineswmr = line_idx + 1
-                if "C " + "SMR1" == line.strip("\n"):
+                if "C SMR1" in line:
                     d_lineswmr = line_idx + 1
-                if "C mainSource" in line.strip("\n"):
+                if "C mainSource" in line:
                     d_mainSource = line_idx + 1
-                if "C microGridSource" in line.strip("\n"):
+                if "C microGridSource" in line:
                     d_microGridSource = line_idx + 1
 
             lines_copy = setgridop(d_lineswmr, lines_copy, grid_checked)
@@ -609,6 +607,7 @@ def fault_inputs() -> dict:
 # dict.items()
 def main():
     params = fault_inputs()
+
     create_directories()
 
     if params["event"] == "fault":
