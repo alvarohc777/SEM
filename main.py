@@ -27,11 +27,15 @@ import random
 # Multiprocessing
 import concurrent.futures
 
-# Global Variables ()
+# Global Variables
+
 EVENTS_DIR = "Events list"
 SCENARIOS_DIR = "Scenarios"
+CSV_DIR = "Archivos CSV"
 FAULT_FILES_LIST = "fault_files_list.txt"
-SOLVER = "C:\\ATP\\atpdraw\\ATP\\solver.bat"
+
+
+SOLVER = r"C:\ATP\atpdraw\ATP\solver.bat"
 EXT = (f"{SCENARIOS_DIR}\*.dbg", f"{SCENARIOS_DIR}\*.lis")
 CWD = os.getcwd()
 
@@ -46,6 +50,11 @@ def create_directories():
     if os.path.exists(SCENARIOS_DIR):
         shutil.rmtree(SCENARIOS_DIR)
     os.mkdir(SCENARIOS_DIR)
+
+    # Create new atp scenarios directory -> create_copies()
+    if os.path.exists(CSV_DIR):
+        shutil.rmtree(CSV_DIR)
+    os.mkdir(CSV_DIR)
 
 
 def fault_list_creator(checked_faults: list, bus_impedance: list):
@@ -431,12 +440,13 @@ def atp_run(filename: str):
     )
 
     apt_process.communicate()
-    # readPL4(pl4_filename)
-    files_to_delete = []
+    readPL4(pl4_filename)
 
+    files_to_delete = []
     try:
         for file in EXT:
-            files_to_delete.extend(glob(file))
+            files_to_delete.extend(glob.glob(file))
+
         for file in files_to_delete:
             os.remove(file)
     except:
@@ -458,7 +468,7 @@ def readPL4(pl4file: str):
     """
     miscData = {"deltat": 0.0, "nvar": 0, "pl4size": 0, "steps": 0, "tmax": 0.0}
 
-    with open("SCENARIOS_ATP\\" + pl4file, "rb") as f:
+    with open(f"{SCENARIOS_DIR}\{pl4file}", "rb") as f:
         pl4 = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
 
         # Read DELTAT
@@ -502,7 +512,7 @@ def readPL4(pl4file: str):
             offset=5 * 16 + nv * 16,
         )
         currentDirectory = os.getcwd()
-        file_path = currentDirectory + "\\SCENARIOS_ATP\\"
+        file_path = f"{CWD}\{SCENARIOS_DIR}\\"
         initial = time.time()
         archivopl4 = pl4file
 
@@ -519,6 +529,7 @@ def readPL4(pl4file: str):
         data = pd.DataFrame(data, columns=header)
 
         csv_path = currentDirectory + "\\ARCHIVOS CSV"
+        csv_path = f"{CWD}\{CSV_DIR}"
         path_array = csv_path.split("\\")
         s = ""
 
@@ -553,7 +564,6 @@ def fault_inputs() -> dict:
 
     buses = [
         802,
-        814,
         832,
     ]
     Ri = 0.00001
@@ -570,8 +580,8 @@ def fault_inputs() -> dict:
         "fault03": False,
         "fault04": False,
         "fault05": False,
-        "fault06": False,
-        "fault07": False,
+        "fault06": True,
+        "fault07": True,
         "fault08": False,
         "fault09": False,
         "fault10": False,
@@ -599,6 +609,7 @@ def fault_inputs() -> dict:
 # dict.items()
 def main():
     params = fault_inputs()
+    create_directories()
 
     if params["event"] == "fault":
         buses = params["buses"]
