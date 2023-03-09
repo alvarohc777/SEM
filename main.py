@@ -32,6 +32,7 @@ SCENARIOS_DIR = "2. Scenarios"
 CSV_DIR = "3. Archivos CSV"
 BASE_FILES_DIR = "Sistemas de prueba"
 FAULT_FILES_LIST = "fault_files_list.txt"
+LOAD_FILES_LIST = "load_files_list.txt"
 
 
 SOLVER = r"C:\ATP\atpdraw\ATP\solver.bat"
@@ -540,6 +541,7 @@ def fault_inputs() -> dict:
     # Validate or transform data
     base_file_path = f"{CWD}\{BASE_FILES_DIR}\IEEE34_form1.atp"
 
+    # For Fault simulations
     buses = [
         802,
         832,
@@ -566,12 +568,17 @@ def fault_inputs() -> dict:
         "fault11": False,
     }
 
+    # For chargeability simulations
+
+    params["load_i"] = 75
+    params["load_f"] = 135
+    params["load_step"] = 5
+
     # Save params in dictionary
     params["buses"] = list(set(buses))
     params["Ri"] = Ri
     params["Rf"] = Rf
     params["R_step"] = R_step
-    params["event"] = "fault"
     params["faults_checkbox"] = faults_checkbox
 
     params["ti"] = ti
@@ -579,6 +586,9 @@ def fault_inputs() -> dict:
     params["microgrid_state"] = microgrid_state
 
     params["base_file_path"] = base_file_path
+
+    # params["event"] = "fault"
+    params["event"] = "load"
     return params
 
 
@@ -622,7 +632,28 @@ def main():
         atp_files_execution()
 
     elif params["event"] == "load":
-        print("función no disponible aún")
+        load_i = params["load_i"]
+        load_f = params["load_f"]
+        load_step = params["load_step"]
+        load_percentages = np.around(
+            np.arange(load_i, load_f + load_step, load_step), 2
+        )
+        load_percentages = load_percentages[load_percentages != 100]
+        load_list_creator(load_percentages)
+
+
+def load_list_creator(load_percentages: list):
+    """Writes load variation list in FAULT_FILES_LIST
+
+    Parameters
+    ----------
+    load_percentages : list
+        List of all load percentage values
+    """
+
+    with open(f"{EVENTS_DIR}\{LOAD_FILES_LIST}", mode="w+") as f:
+        for percentage in load_percentages:
+            f.write(f"Load_{percentage}.atp\n")
 
 
 if __name__ == "__main__":
