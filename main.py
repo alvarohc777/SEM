@@ -31,8 +31,7 @@ EVENTS_DIR = "1. Events list"
 SCENARIOS_DIR = "2. Scenarios"
 CSV_DIR = "3. Archivos CSV"
 BASE_FILES_DIR = "Sistemas de prueba"
-FAULT_FILES_LIST = "fault_files_list.txt"
-LOAD_FILES_LIST = "load_files_list.txt"
+EVENT_FILES_LIST = "event_files_list.txt"
 
 
 SOLVER = r"C:\ATP\atpdraw\ATP\solver.bat"
@@ -40,6 +39,7 @@ EXT = (f"{SCENARIOS_DIR}\*.dbg", f"{SCENARIOS_DIR}\*.lis")
 CWD = os.getcwd()
 
 
+# For Fault simulation
 def create_directories():
     # Create new events lists directory -> fault_list_
     if os.path.exists(EVENTS_DIR):
@@ -68,7 +68,7 @@ def fault_list_creator(checked_faults: list, bus_impedance: list):
         List of combination of buses at fault and impedance values
     """
 
-    f = open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", mode="w+")
+    f = open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="w+")
     for fault_idx in checked_faults:
         for bus, z in bus_impedance:
             f.write(f"Fault{fault_idx:02}_B{bus}_RF{z}.atp\n")
@@ -84,7 +84,7 @@ def create_copies(base_file_path: str):
     base_file_path : str
         Base atp file.
     """
-    with open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", mode="r") as f:
+    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="r") as f:
         for line in f:
             new_name = line.strip("\n")
             target = f"{CWD}\{SCENARIOS_DIR}\{new_name}"
@@ -112,7 +112,7 @@ def atp_fault_file(TFf: str, TFi: str, grid_checked: bool):
     grid_checked : bool
         Microgrid Switch State (True: microgrid on / False: microgrid off)
     """
-    with open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", "r") as f:
+    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
         for atp_file_name in f:
             # Get parameters from file
             nombre = atp_file_name.rstrip("\n")
@@ -389,7 +389,7 @@ def atp_files_execution():
     """Initiates parallel execution for each file"""
     cores = os.cpu_count()
     filenames_gen = (
-        row.strip("\n") for row in open(f"{EVENTS_DIR}\{FAULT_FILES_LIST}", "r")
+        row.strip("\n") for row in open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r")
     )
     t1_total = time.perf_counter()
     with concurrent.futures.ProcessPoolExecutor(max_workers=cores - 3) as executor:
@@ -528,6 +528,21 @@ def readPL4(pl4file: str):
         final = time.time()
 
 
+# For load variation
+def load_list_creator(load_percentages: list):
+    """Writes load variation list in EVENT_FILES_LIST
+
+    Parameters
+    ----------
+    load_percentages : list
+        List of all load percentage values
+    """
+
+    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="w+") as f:
+        for percentage in load_percentages:
+            f.write(f"Load_{percentage}.atp\n")
+
+
 def fault_inputs() -> dict:
     """Function to receive all simulation parameters inputs
 
@@ -639,21 +654,10 @@ def main():
             np.arange(load_i, load_f + load_step, load_step), 2
         )
         load_percentages = load_percentages[load_percentages != 100]
+
         load_list_creator(load_percentages)
 
-
-def load_list_creator(load_percentages: list):
-    """Writes load variation list in FAULT_FILES_LIST
-
-    Parameters
-    ----------
-    load_percentages : list
-        List of all load percentage values
-    """
-
-    with open(f"{EVENTS_DIR}\{LOAD_FILES_LIST}", mode="w+") as f:
-        for percentage in load_percentages:
-            f.write(f"Load_{percentage}.atp\n")
+        # create_copies
 
 
 if __name__ == "__main__":
