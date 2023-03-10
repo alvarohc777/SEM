@@ -539,8 +539,9 @@ def load_list_creator(load_percentages: list):
     """
 
     with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="w+") as f:
-        for percentage in load_percentages:
-            f.write(f"Load_{percentage}.atp\n")
+        for low, high in load_percentages:
+            # f.write(f"Load_{percentage:06.2f}.atp\n")
+            f.write(f"Load_{low:06.2f}_{high:06.2f}.atp\n")
 
 
 def fault_inputs() -> dict:
@@ -585,9 +586,10 @@ def fault_inputs() -> dict:
 
     # For chargeability simulations
 
-    params["load_i"] = 75
-    params["load_f"] = 135
-    params["load_step"] = 5
+    params["load_low"] = 75
+    params["load_high"] = 135
+    params["events_amount"] = 100
+    params["max_load_step"] = 5
 
     # Save params in dictionary
     params["buses"] = list(set(buses))
@@ -614,7 +616,6 @@ def main():
     params = fault_inputs()
 
     create_directories()
-
     if params["event"] == "fault":
         buses = params["buses"]
         Ri = params["Ri"]
@@ -636,7 +637,6 @@ def main():
             return
 
         fault_list_creator(checked_faults, bus_impedance)
-
         create_copies(params["base_file_path"])
 
         ti = params["ti"]
@@ -647,17 +647,63 @@ def main():
         atp_files_execution()
 
     elif params["event"] == "load":
-        load_i = params["load_i"]
-        load_f = params["load_f"]
-        load_step = params["load_step"]
-        load_percentages = np.around(
-            np.arange(load_i, load_f + load_step, load_step), 2
-        )
-        load_percentages = load_percentages[load_percentages != 100]
+        load_low = params["load_low"]
+        load_high = params["load_high"]
+        max_load_step = params["max_load_step"]
+        events_amount = params["events_amount"]
 
-        load_list_creator(load_percentages)
+        initial_load_values = np.around(
+            np.random.uniform(load_low, load_high, events_amount), 2
+        )
+        target_load_values = target_load_vect(
+            initial_load_values, load_high, load_low, max_load_step
+        )
+        target_load_values = np.around(target_load_values, 2)
+        load_values = np.stack((initial_load_values, target_load_values), axis=1)
+
+        # load_percentages = np.around(
+        #     np.arange(load_low, load_high + max_load_step, max_load_step), 2
+        # )
+        # load_percentages = load_percentages[load_percentages != 100]
+
+        load_list_creator(load_values)
+        create_copies(params["base_file_path"])
 
         # create_copies
+
+
+def target_load(
+    initial_load: np.ndarray, load_high: float, load_low: float, max_load_step: float
+) -> float:
+    """Takes initual load perctentage and returns target load percentage
+
+    Parameters
+    ----------
+    initial_load : np.ndarray
+        Initial load percentage
+    load_high : float
+        Upper load percentage limit.
+    load_low : float
+        Lower load percentage limit.
+    max_load_step : float
+        Max percentage difference between initial_load and target load
+
+    Returns
+    -------
+    float
+        target load percentage
+    """
+    max_val = initial_load + max_load_step
+    min_val = initial_load - max_load_step
+    if initial_load > load_high - max_load_step:
+        return np.random.uniform(min_val, load_high)
+    elif initial_load < load_low + max_load_step:
+        return np.random.uniform(load_low, max_val)
+    else:
+        return np.random.uniform(min_val, max_val)
+
+
+target_load_vect = np.vectorize(target_load)
 
 
 if __name__ == "__main__":
