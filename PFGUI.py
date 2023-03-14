@@ -21,6 +21,7 @@ import time
 from glob import glob
 
 
+
 def readPL4(pl4file: str):
     """This function extracts signals from a PL4 file and saves
     it as a CSV file. Function found at: https://github.com/ldemattos/readPL4.

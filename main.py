@@ -26,7 +26,6 @@ import random
 import concurrent.futures
 
 # Global Constants
-
 EVENTS_DIR = "1. Events list"
 SCENARIOS_DIR = "2. Scenarios"
 CSV_DIR = "3. Archivos CSV"
@@ -588,7 +587,7 @@ def fault_inputs() -> dict:
 
     params["load_low"] = 75
     params["load_high"] = 135
-    params["events_amount"] = 100
+    params["events_amount"] = 15
     params["max_load_step"] = 5
 
     # Save params in dictionary
