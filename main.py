@@ -5,6 +5,7 @@ import mmap
 # NumPy Stack
 import pandas as pd
 import numpy as np
+from scipy.stats import truncnorm
 
 # Measure Performance
 import time
@@ -527,7 +528,102 @@ def readPL4(pl4file: str):
         final = time.time()
 
 
+# End Faults
+# ---------------------------------------------------------------------------
+
 # For load variation
+
+
+# Distribución normal truncada
+def get_truncated_normal(
+    mean: float = 0, sd: int = 1, low: float = 0, upp: float = 10
+) -> np.ndarray:
+    """Return array of truncated normal distribution with:
+    mean = mean
+    standard deviation = sd
+    lower limit = low
+    upper limit = upp
+
+    Parameters
+    ----------
+    mean : float, optional
+        Truncated distribution Mean, by default 0
+    sd : int, optional
+        Truncated distribution standard deviation, by default 1
+    low : float, optional
+        Truncated distribution lower limit, by default 0
+    upp : float, optional
+        Truncated distribution upper limit, by default 10
+
+    Returns
+    -------
+    np.ndarray
+        Array of truncated normal distribution
+    """
+    return truncnorm((low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
+
+
+def load_split(
+    array: np.ndarray, len_a: int, len_b: int, len_c: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Splits array of normal distribution load percentages into
+    three new arrays, one for each phase.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        Array of percentages
+    len_a : int
+        Amount of loads on phase A
+    len_b : int
+        Amount of loads on phase B
+    len_c : int
+        Amount of loads on phase C
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        load percentages split for phase A, B and C, respectively
+    """
+    a = array[:len_a]
+    b = array[len_a : len_a + len_b]
+    c = array[len_a + len_b :]
+    return a, b, c
+
+
+def update_loads(Z_array: np.ndarray, lines_copy: list) -> list:
+    """Returns list of lines with updated impedances
+
+    Parameters
+    ----------
+    Z_array : np.ndarray
+        Array of indices and impedances (complex number).
+        Dimension (m, 2), where
+            m = number of impedances
+            (,0) = indices column
+            (,1) = impedances column
+    lines_copy : list
+        List with .atp file content
+
+    Returns
+    -------
+    list
+        List of .atp file content with updated impedances
+    """
+    for Z in Z_array:
+        idx = Z[0]
+        z = Z[1]
+
+        idx = int(idx)
+        R = f"{z.real:.6f}".center(12)
+        X = f"{z.imag:.6f}".center(12)
+        line = lines_copy[idx]
+        new_line = f"{line[:30]}{R}{line[42:46]}{X}{line[58:]}"
+
+        lines_copy[idx] = new_line
+    return lines_copy
+
+
 def load_list_creator(load_percentages: list):
     """Writes load variation list in EVENT_FILES_LIST
 
@@ -543,6 +639,165 @@ def load_list_creator(load_percentages: list):
             f.write(f"Load_{low:06.2f}_{high:06.2f}.atp\n")
 
 
+def base_file_loads(lines: list) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Creates an array of admitances for each phase, with file line index
+
+    Parameters
+    ----------
+    base_file_path : str
+        List with files lines
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        Phase A, B and C admitance matrices of shape (m, 2), where
+        (,0) are indices of file lines where each load appears and
+        (,1) are the admitance values (complex number)
+    """
+    # Validación suma admitancias serie
+    lines_copy = lines.copy()
+    Za = np.empty((0, 2))
+    Zb = np.empty((0, 2))
+    Zc = np.empty((0, 2))
+    for idx, line in enumerate(lines_copy):
+        if "C Load" in line:
+            if "3f" in line:
+                Ra = float(lines_copy[idx + 1][30:42])
+                Xa = float(lines_copy[idx + 1][46:58])
+                za = Ra + Xa * 1j
+                if not np.abs(za) > 1e20:
+                    Za = np.append(Za, [[idx + 1, za]], axis=0)
+
+                Rb = float(lines_copy[idx + 2][30:42])
+                Xb = float(lines_copy[idx + 2][46:58])
+                zb = Rb + Xb * 1j
+                if not np.abs(zb) > 1e20:
+                    Zb = np.append(Zb, [[idx + 2, zb]], axis=0)
+
+                Rc = float(lines_copy[idx + 3][30:42])
+                Xc = float(lines_copy[idx + 3][46:58])
+                zc = Rc + Xc * 1j
+                if not np.abs(zc) > 1e20:
+                    Zc = np.append(Zc, [[idx + 3, zc]], axis=0)
+            else:
+                R = float(lines_copy[idx + 1][30:42])
+                X = float(lines_copy[idx + 1][46:58])
+                z = R + X * 1j
+                if " A" in line:
+                    Za = np.append(Za, [[idx + 1, z]], axis=0)
+                if " B" in line:
+                    Zb = np.append(Zb, [[idx + 1, z]], axis=0)
+                if " C" in line:
+                    Zc = np.append(Zc, [[idx + 1, z]], axis=0)
+
+    # Find Y total for each phase
+    Ya = 1 / Za[:, 1]
+    Yb = 1 / Zb[:, 1]
+    Yc = 1 / Zc[:, 1]
+    print(Za.shape)
+    print(Ya.shape)
+
+    Ya = np.append([Za[:, 0]], [Ya], axis=0).T
+    Yb = np.append([Zb[:, 0]], [Yb], axis=0).T
+    Yc = np.append([Zc[:, 0]], [Yc], axis=0).T
+
+    return Ya, Yb, Yc
+
+
+def initial_load_state(YA, YB, YC, lines):
+    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
+        for atp_file_name in f:
+            lines_copy = lines.copy()
+            atp_file_name = atp_file_name.strip("\n")
+
+            cargabilidad_inicial = float(atp_file_name[5:11])
+            cargabilidad_final = float(atp_file_name[12:18])
+            Ya = np.copy(YA[:, 1])
+            Yb = np.copy(YB[:, 1])
+            Yc = np.copy(YC[:, 1])
+            idx_a = np.copy(YA[:, 0])
+            idx_b = np.copy(YB[:, 0])
+            idx_c = np.copy(YC[:, 0])
+
+            print(atp_file_name)
+            print(cargabilidad_inicial)
+            print(cargabilidad_final)
+
+            len_a = Ya.shape[0]
+            len_b = Yb.shape[0]
+            len_c = Yc.shape[0]
+            load_amount = len_a + len_b + len_c
+
+            delta_cargabilidad = cargabilidad_final - cargabilidad_inicial
+
+            initial_load = (
+                get_truncated_normal(
+                    mean=cargabilidad_inicial, sd=1, low=0, upp=200
+                ).rvs(load_amount)
+                / 100
+            )
+            target_load = (
+                get_truncated_normal(
+                    mean=delta_cargabilidad, sd=1, low=-10, upp=10
+                ).rvs(load_amount)
+                / 100
+            )
+
+            # Variación de Carga por Fase
+            initial_a, initial_b, initial_c = load_split(
+                initial_load, len_a, len_b, len_c
+            )
+            target_a, target_b, target_c = load_split(target_load, len_a, len_b, len_c)
+            print(f"Cargabilidad inicial: {np.mean(initial_a):.2%}\n")
+            # Admitancias por fase iniciales y finales
+            Ya_initial, Yb_initial, Yc_initial = (
+                Ya * initial_a,
+                Yb * initial_b,
+                Yc * initial_c,
+            )
+            Ya_target = Ya_initial * target_a + Ya_initial
+            Yb_target = Yb_initial * target_b + Yb_initial
+            Yc_target = Yc_initial * target_c + Yc_initial
+
+            # Admitancia total luego de la variación de carga
+            Y_initial_total = Ya_initial.sum() + Yb_initial.sum() + Yc_initial.sum()
+            Y_target_total = Ya_target.sum() + Yb_target.sum() + Yc_target.sum()
+
+            # Hallar impedancias a partir de las admitancias
+            Za_initial = 1 / Ya_initial
+            Zb_initial = 1 / Yb_initial
+            Zc_initial = 1 / Yc_initial
+            Za_target = 1 / Ya_target
+            Zb_target = 1 / Yb_target
+            Zc_target = 1 / Yc_target
+
+            # Crear nuevo vector de impedancias con índices (concatenar Z_initial/targer con Z)
+            Za_ini = np.append([idx_a], [Za_initial], axis=0).T
+            Za_tar = np.append([idx_a], [Za_target], axis=0).T
+            Zb_ini = np.append([idx_b], [Zb_initial], axis=0).T
+            Zb_tar = np.append([idx_b], [Zb_target], axis=0).T
+            Zc_ini = np.append([idx_c], [Zc_initial], axis=0).T
+            Zc_tar = np.append([idx_c], [Zc_target], axis=0).T
+
+            lines_copy = update_loads(Za_ini, lines_copy)
+            lines_copy = update_loads(Zb_ini, lines_copy)
+            lines_copy = update_loads(Zc_ini, lines_copy)
+
+            with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
+                file.writelines(lines_copy)
+
+            # with open("IEEE34_form1_update_loads_prueba.atp", "w+") as f:
+            #     lines_copy = update_loads(Za_ini, lines_copy)
+            #     lines_copy = update_loads(Zb_ini, lines_copy)
+            #     lines_copy = update_loads(Zc_ini, lines_copy)
+            #     f.writelines(lines_copy)
+
+
+# End Load Variation
+# ----------------------------------------------------------------------------
+
+
+# Simulating App Inputs
 def fault_inputs() -> dict:
     """Function to receive all simulation parameters inputs
 
@@ -554,7 +809,7 @@ def fault_inputs() -> dict:
     params = {}
 
     # Validate or transform data
-    base_file_path = f"{CWD}\{BASE_FILES_DIR}\IEEE34_form1.atp"
+    base_file_path = f"{CWD}\{BASE_FILES_DIR}\IEEE34_form1_update_loads.atp"
 
     # For Fault simulations
     buses = [
@@ -660,13 +915,16 @@ def main():
         target_load_values = np.around(target_load_values, 2)
         load_values = np.stack((initial_load_values, target_load_values), axis=1)
 
-        # load_percentages = np.around(
-        #     np.arange(load_low, load_high + max_load_step, max_load_step), 2
-        # )
-        # load_percentages = load_percentages[load_percentages != 100]
+        #
 
         load_list_creator(load_values)
         create_copies(params["base_file_path"])
+        # Copy lines
+        with open(params["base_file_path"], "r+") as f:
+            lines = f.readlines()
+
+        Ya, Yb, Yc = base_file_loads(lines)
+        initial_load_state(Ya, Yb, Yc, lines)
 
         # create_copies
 
