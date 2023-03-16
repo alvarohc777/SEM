@@ -26,6 +26,7 @@ import random
 # Multiprocessing
 import concurrent.futures
 
+
 # Global Constants
 EVENTS_DIR = "1. Events list"
 SCENARIOS_DIR = "2. Scenarios"
@@ -534,6 +535,41 @@ def readPL4(pl4file: str):
 # For load variation
 
 
+# Name generation
+def target_load(
+    initial_load: np.ndarray, load_high: float, load_low: float, max_load_step: float
+) -> float:
+    """Takes initual load perctentage and returns target load percentage
+
+    Parameters
+    ----------
+    initial_load : np.ndarray
+        Initial load percentage
+    load_high : float
+        Upper load percentage limit.
+    load_low : float
+        Lower load percentage limit.
+    max_load_step : float
+        Max percentage difference between initial_load and target load
+
+    Returns
+    -------
+    float
+        target load percentage
+    """
+    max_val = initial_load + max_load_step
+    min_val = initial_load - max_load_step
+    if initial_load > load_high - max_load_step:
+        return np.random.uniform(min_val, load_high)
+    elif initial_load < load_low + max_load_step:
+        return np.random.uniform(load_low, max_val)
+    else:
+        return np.random.uniform(min_val, max_val)
+
+
+target_load_vect = np.vectorize(target_load)
+
+
 # Distribución normal truncada
 def get_truncated_normal(
     mean: float = 0, sd: int = 1, low: float = 0, upp: float = 10
@@ -694,8 +730,6 @@ def base_file_loads(lines: list) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     Ya = 1 / Za[:, 1]
     Yb = 1 / Zb[:, 1]
     Yc = 1 / Zc[:, 1]
-    print(Za.shape)
-    print(Ya.shape)
 
     Ya = np.append([Za[:, 0]], [Ya], axis=0).T
     Yb = np.append([Zb[:, 0]], [Yb], axis=0).T
@@ -718,10 +752,6 @@ def initial_load_state(YA, YB, YC, lines):
             idx_a = np.copy(YA[:, 0])
             idx_b = np.copy(YB[:, 0])
             idx_c = np.copy(YC[:, 0])
-
-            print(atp_file_name)
-            print(cargabilidad_inicial)
-            print(cargabilidad_final)
 
             len_a = Ya.shape[0]
             len_b = Yb.shape[0]
@@ -748,7 +778,7 @@ def initial_load_state(YA, YB, YC, lines):
                 initial_load, len_a, len_b, len_c
             )
             target_a, target_b, target_c = load_split(target_load, len_a, len_b, len_c)
-            print(f"Cargabilidad inicial: {np.mean(initial_a):.2%}\n")
+
             # Admitancias por fase iniciales y finales
             Ya_initial, Yb_initial, Yc_initial = (
                 Ya * initial_a,
@@ -771,7 +801,7 @@ def initial_load_state(YA, YB, YC, lines):
             Zb_target = 1 / Yb_target
             Zc_target = 1 / Yc_target
 
-            # Crear nuevo vector de impedancias con índices (concatenar Z_initial/targer con Z)
+            # Crear nuevo vector de impedancias con índices (concatenar Z_initial/target con idx)
             Za_ini = np.append([idx_a], [Za_initial], axis=0).T
             Za_tar = np.append([idx_a], [Za_target], axis=0).T
             Zb_ini = np.append([idx_b], [Zb_initial], axis=0).T
@@ -785,12 +815,6 @@ def initial_load_state(YA, YB, YC, lines):
 
             with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
                 file.writelines(lines_copy)
-
-            # with open("IEEE34_form1_update_loads_prueba.atp", "w+") as f:
-            #     lines_copy = update_loads(Za_ini, lines_copy)
-            #     lines_copy = update_loads(Zb_ini, lines_copy)
-            #     lines_copy = update_loads(Zc_ini, lines_copy)
-            #     f.writelines(lines_copy)
 
 
 # End Load Variation
@@ -809,7 +833,15 @@ def fault_inputs() -> dict:
     params = {}
 
     # Validate or transform data
-    base_file_path = f"{CWD}\{BASE_FILES_DIR}\IEEE34_form1_update_loads.atp"
+
+    base_file_name = "IEEE34.atp"
+    base_file_path = f"{CWD}\{BASE_FILES_DIR}\{base_file_name}"
+
+    global BASE_FILE_NAME
+    global BASE_FILE_PATH
+
+    BASE_FILE_NAME = base_file_name
+    BASE_FILE_PATH = base_file_path
 
     # For Fault simulations
     buses = [
@@ -857,6 +889,7 @@ def fault_inputs() -> dict:
     params["microgrid_state"] = microgrid_state
 
     params["base_file_path"] = base_file_path
+    params["base_file_name"] = base_file_name
 
     # params["event"] = "fault"
     params["event"] = "load"
@@ -867,6 +900,7 @@ def fault_inputs() -> dict:
 # dict.keys()
 # dict.items()
 def main():
+    a = "hola"
     params = fault_inputs()
 
     create_directories()
@@ -901,6 +935,7 @@ def main():
         atp_files_execution()
 
     elif params["event"] == "load":
+        print(BASE_FILE_NAME)
         load_low = params["load_low"]
         load_high = params["load_high"]
         max_load_step = params["max_load_step"]
@@ -927,40 +962,6 @@ def main():
         initial_load_state(Ya, Yb, Yc, lines)
 
         # create_copies
-
-
-def target_load(
-    initial_load: np.ndarray, load_high: float, load_low: float, max_load_step: float
-) -> float:
-    """Takes initual load perctentage and returns target load percentage
-
-    Parameters
-    ----------
-    initial_load : np.ndarray
-        Initial load percentage
-    load_high : float
-        Upper load percentage limit.
-    load_low : float
-        Lower load percentage limit.
-    max_load_step : float
-        Max percentage difference between initial_load and target load
-
-    Returns
-    -------
-    float
-        target load percentage
-    """
-    max_val = initial_load + max_load_step
-    min_val = initial_load - max_load_step
-    if initial_load > load_high - max_load_step:
-        return np.random.uniform(min_val, load_high)
-    elif initial_load < load_low + max_load_step:
-        return np.random.uniform(load_low, max_val)
-    else:
-        return np.random.uniform(min_val, max_val)
-
-
-target_load_vect = np.vectorize(target_load)
 
 
 if __name__ == "__main__":
