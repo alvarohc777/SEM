@@ -8,6 +8,8 @@ import numpy as np
 # Regular expressions
 import re
 
+from pathlib import Path
+
 
 def initial_loads_creator(
     min_load: float, max_load: float, events_amount
@@ -23,11 +25,23 @@ def load_list_creator(load_percentages: list):
     load_percentages : list
         List of all load percentage values
     """
+    list_path = Path(f"{EVENTS_DIR}\{EVENT_FILES_LIST}")
 
-    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="w+") as f:
-        for load in load_percentages:
-            # f.write(f"Load_{percentage:06.2f}.atp\n")
-            f.write(f"L{load:06.2f}.atp\n")
+    loads = []
+    for load in load_percentages:
+        loads.append(f"L{load:06.2f}.atp\n")
+    new_lines = loads.copy()
+    if list_path.is_file():
+        new_lines = []
+        with open(list_path, "r+") as f:
+            lines = f.readlines()
+        for line, load in zip(lines, loads):
+            line = line.strip("\n")[:-4]
+            new_lines.append(f"{line}_{load}")
+
+    with open(list_path, "w+") as f:
+        for line in new_lines:
+            f.write(line)
 
 
 def base_file_loads(lines: list) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -184,7 +198,6 @@ def update_loads(Z_array: np.ndarray, lines_copy: list) -> list:
 
 
 def initial_load_state(YA, YB, YC, lines_copy, atp_file_name):
-
     pattern_load = "L(\d{3}\.\d{2})"
     pattern_load_change = "LC(\d{3}\.\d{2})_(\d{3}\.\d{2})"
     cargabilidad_inicial = float(re.search(pattern_load, atp_file_name).group(1))
