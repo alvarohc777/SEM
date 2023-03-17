@@ -60,4 +60,13 @@ def element_indices(lines: list) -> dict:
             element_idx["mainSource"] = line_idx + 1
         if "C microGridSource" in line:
             element_idx["microGridSource"] = line_idx + 1
+        if "C switch load tri" in line:
+            element_idx["load_switch_tri"] = lines[line_idx : line_idx + 4].copy()
+        if "C switch load mono" in line:
+            element_idx["load_switch_mono"] = lines[line_idx : line_idx + 2].copy()
+        # if "C switch load tri" in line:
+        #     element_idx["load_switch_tri"] = lines[line_idx : line_idx + 4].copy()
+        # elif "C switch load mono" in line:
+        #     element_idx["load_switch_mono"] = lines[line_idx : line_idx + 2].copy()
+
     return element_idx

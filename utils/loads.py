@@ -263,4 +263,39 @@ def load_change_list_creator(load_percentages: list):
     with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", mode="w+") as f:
         for low, high in load_percentages:
             # f.write(f"Load_{percentage:06.2f}.atp\n")
-            f.write(f"Load_{low:06.2f}_{high:06.2f}.atp\n")
+            f.write(f"L{low:06.2f}_{high:06.2f}.atp\n")
+
+
+# Name Loads
+def target_load(
+    initial_load: np.ndarray, load_high: float, load_low: float, max_load_step: float
+) -> float:
+    """Takes initual load perctentage and returns target load percentage
+
+    Parameters
+    ----------
+    initial_load : np.ndarray
+        Initial load percentage
+    load_high : float
+        Upper load percentage limit.
+    load_low : float
+        Lower load percentage limit.
+    max_load_step : float
+        Max percentage difference between initial_load and target load
+
+    Returns
+    -------
+    float
+        target load percentage
+    """
+    max_val = initial_load + max_load_step
+    min_val = initial_load - max_load_step
+    if initial_load > load_high - max_load_step:
+        return np.random.uniform(min_val, load_high)
+    elif initial_load < load_low + max_load_step:
+        return np.random.uniform(load_low, max_val)
+    else:
+        return np.random.uniform(min_val, max_val)
+
+
+target_load_vect = np.vectorize(target_load)

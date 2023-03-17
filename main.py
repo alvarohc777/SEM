@@ -87,8 +87,30 @@ def main():
                 lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
+    if params["event"] == "load_change":
+        # Load simulation Parameters
+        min_load = params["min_load"]
+        max_load = params["max_load"]
+        max_load_step = params["max_load_step"]
+        events_amount = params["events_amount"]
 
-        atp_exec.atp_files_execution()
+        initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
+        target_load_values = loads.target_load_vect(
+            initial_load_values, max_load, min_load, max_load_step
+        )
+        target_load_values = np.around(target_load_values, 2)
+        load_values = np.stack((initial_load_values, target_load_values), axis=1)
+        loads.load_change_list_creator(load_values)
+        Ya, Yb, Yc = base_file_loads(lines)
+        with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
+            for atp_file_name in f:
+                atp_file_name = atp_file_name.strip("\n")
+                print(atp_file_name)
+                lines_copy = lines.copy()
+                lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
+                lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
+                    file.writelines(lines_copy)
 
     if params["event"] == "fault":
         # Fault simulation parameters
@@ -138,7 +160,7 @@ def main():
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
                     file.writelines(lines_copy)
 
-        atp_exec.atp_files_execution()
+    atp_exec.atp_files_execution()
 
 
 if __name__ == "__main__":

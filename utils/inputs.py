@@ -29,7 +29,7 @@ def inputs() -> dict:
     Ri = 0.00001
 
     Rf = 100
-    R_step = 10
+    R_step = 20
 
     ti = 0.05
     tf = 0.1
@@ -71,6 +71,7 @@ def inputs() -> dict:
     params["base_file_path"] = base_file_path
     params["base_file_name"] = base_file_name
 
-    params["event"] = "fault"
+    # params["event"] = "fault"
     # params["event"] = "loads"
+    params["event"] = "load_change"
     return params
