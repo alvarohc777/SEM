@@ -28,7 +28,7 @@ def inputs() -> dict:
     ]
     Ri = 0.00001
 
-    Rf = 20
+    Rf = 100
     R_step = 10
 
     ti = 0.05

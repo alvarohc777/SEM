@@ -5,7 +5,7 @@ import random
 def source_phase_change(lines_copy: list, element_idx) -> list:
     main_source_idx = element_idx["mainSource"]
     MG_source_idx = element_idx["microGridSource"]
-    phase_int = random.randint(0, 180)
+    phase_int = random.randint(0, 359)
     phase_dec = round(random.random(), 5)
     source_phase = phase_int + phase_dec
     phi_a = str(round(source_phase, 5))

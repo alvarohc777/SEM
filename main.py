@@ -85,7 +85,7 @@ def main():
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
                 lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
-                with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
+                with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
 
         atp_exec.atp_files_execution()
@@ -127,9 +127,14 @@ def main():
             for atp_file_name in f:
                 atp_file_name = atp_file_name.strip("\n")
                 print(atp_file_name)
+
+                # Modify copied lines
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
                 lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                lines_copy = faults.atp_fault_file(
+                    lines_copy, params, element_idx, atp_file_name
+                )
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
                     file.writelines(lines_copy)
 
