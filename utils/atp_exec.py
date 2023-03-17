@@ -124,14 +124,20 @@ def readPL4(pl4file: str):
         for i in range(0, nv):
             pos = 5 * 16 + i * 16
             h = struct.unpack("3x1c6s6s", pl4[pos : pos + 16])
-            dfHEAD = dfHEAD.append(
-                {"TYPE": int(h[0]), "FROM": h[1], "TO": h[2]}, ignore_index=True
+            # dfHEAD = dfHEAD.append(
+            #     {"TYPE": int(h[0]), "FROM": h[1], "TO": h[2]}, ignore_index=True
+            # )
+            df_new_row = pd.DataFrame(
+                {"TYPE": [int(h[0])], "FROM": [h[1]], "TO": [h[2]]}
             )
+            dfHEAD = pd.concat([dfHEAD, df_new_row])
+
             dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "V-node" if x == 4 else x)
             dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "E-bran" if x == 7 else x)
             dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "V-bran" if x == 8 else x)
             dfHEAD["TYPE"] = dfHEAD["TYPE"].apply(lambda x: "I-bran" if x == 9 else x)
-
+        # print(dfHEAD)
+        # print(dfHEAD.type)
         data = np.memmap(
             f,
             dtype=np.float32,
