@@ -26,10 +26,15 @@ import random
 # Multiprocessing
 import concurrent.futures
 
+# CONSTANTS
+from utils.CONFIG import EVENTS_DIR, EVENT_FILES_LIST, SCENARIOS_DIR
+
 import utils.CONFIG as CONFIG
 from utils import loads, tool_start
 from utils.tool_start import create_directories
+import utils.phase_angle as phase_angle
 import utils.atp_exec as atp_exec
+import utils.tool_start as tool_start
 from utils.loads import (
     initial_loads_creator,
     load_list_creator,
@@ -115,9 +120,16 @@ def inputs() -> dict:
 
 def main():
     params = inputs()
-    create_directories()
+    tool_start.create_directories()
     BASE_FILE_PATH = CONFIG.BASE_FILE_PATH
     BASE_FILE_NAME = CONFIG.BASE_FILE_NAME
+
+    # Copy lines from base file
+    with open(BASE_FILE_PATH, "r+") as f:
+        lines = f.readlines()
+
+    element_idx = tool_start.element_indices(lines)
+
     if params["event"] == "loads":
         # Initial Parameters
         print(CONFIG.BASE_FILE_PATH)
@@ -129,12 +141,15 @@ def main():
         initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
         load_list_creator(initial_load_values)
 
-        # Copy lines from base file
-        with open(BASE_FILE_PATH, "r+") as f:
-            lines = f.readlines()
-
         Ya, Yb, Yc = base_file_loads(lines)
-        initial_load_state(Ya, Yb, Yc, lines)
+        with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
+            for atp_file_name in f:
+                atp_file_name = atp_file_name.strip("\n")
+                lines_copy = lines.copy()
+                lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
+                lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
+                    file.writelines(lines_copy)
         atp_exec.atp_files_execution()
 
 

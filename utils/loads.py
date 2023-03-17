@@ -183,68 +183,59 @@ def update_loads(Z_array: np.ndarray, lines_copy: list) -> list:
     return lines_copy
 
 
-def initial_load_state(YA, YB, YC, lines):
-    with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
-        for atp_file_name in f:
-            lines_copy = lines.copy()
-            atp_file_name = atp_file_name.strip("\n")
+def initial_load_state(YA, YB, YC, lines_copy, atp_file_name):
 
-            pattern_load = "L(\d{3}\.\d{2})"
-            pattern_load_change = "LC(\d{3}\.\d{2})_(\d{3}\.\d{2})"
-            cargabilidad_inicial = float(
-                re.search(pattern_load, atp_file_name).group(1)
-            )
+    pattern_load = "L(\d{3}\.\d{2})"
+    pattern_load_change = "LC(\d{3}\.\d{2})_(\d{3}\.\d{2})"
+    cargabilidad_inicial = float(re.search(pattern_load, atp_file_name).group(1))
 
-            Ya = np.copy(YA[:, 1])
-            Yb = np.copy(YB[:, 1])
-            Yc = np.copy(YC[:, 1])
-            idx_a = np.copy(YA[:, 0])
-            idx_b = np.copy(YB[:, 0])
-            idx_c = np.copy(YC[:, 0])
+    Ya = np.copy(YA[:, 1])
+    Yb = np.copy(YB[:, 1])
+    Yc = np.copy(YC[:, 1])
+    idx_a = np.copy(YA[:, 0])
+    idx_b = np.copy(YB[:, 0])
+    idx_c = np.copy(YC[:, 0])
 
-            len_a = Ya.shape[0]
-            len_b = Yb.shape[0]
-            len_c = Yc.shape[0]
-            load_amount = len_a + len_b + len_c
+    len_a = Ya.shape[0]
+    len_b = Yb.shape[0]
+    len_c = Yc.shape[0]
+    load_amount = len_a + len_b + len_c
 
-            initial_load = (
-                get_truncated_normal(
-                    mean=cargabilidad_inicial, sd=1, low=0, upp=200
-                ).rvs(load_amount)
-                / 100
-            )
+    initial_load = (
+        get_truncated_normal(mean=cargabilidad_inicial, sd=1, low=0, upp=200).rvs(
+            load_amount
+        )
+        / 100
+    )
 
-            # Variación de Carga por Fase
-            initial_a, initial_b, initial_c = load_split(
-                initial_load, len_a, len_b, len_c
-            )
+    # Variación de Carga por Fase
+    initial_a, initial_b, initial_c = load_split(initial_load, len_a, len_b, len_c)
 
-            # Admitancias por fase iniciales y finales
-            Ya_initial, Yb_initial, Yc_initial = (
-                Ya * initial_a,
-                Yb * initial_b,
-                Yc * initial_c,
-            )
+    # Admitancias por fase iniciales y finales
+    Ya_initial, Yb_initial, Yc_initial = (
+        Ya * initial_a,
+        Yb * initial_b,
+        Yc * initial_c,
+    )
 
-            # Admitancia total luego de la variación de carga
-            Y_initial_total = Ya_initial.sum() + Yb_initial.sum() + Yc_initial.sum()
+    # Admitancia total luego de la variación de carga
+    Y_initial_total = Ya_initial.sum() + Yb_initial.sum() + Yc_initial.sum()
 
-            # Hallar impedancias a partir de las admitancias
-            Za_initial = 1 / Ya_initial
-            Zb_initial = 1 / Yb_initial
-            Zc_initial = 1 / Yc_initial
+    # Hallar impedancias a partir de las admitancias
+    Za_initial = 1 / Ya_initial
+    Zb_initial = 1 / Yb_initial
+    Zc_initial = 1 / Yc_initial
 
-            # Crear nuevo vector de impedancias con índices (concatenar Z_initial/target con idx)
-            Za_ini = np.append([idx_a], [Za_initial], axis=0).T
-            Zb_ini = np.append([idx_b], [Zb_initial], axis=0).T
-            Zc_ini = np.append([idx_c], [Zc_initial], axis=0).T
+    # Crear nuevo vector de impedancias con índices (concatenar Z_initial/target con idx)
+    Za_ini = np.append([idx_a], [Za_initial], axis=0).T
+    Zb_ini = np.append([idx_b], [Zb_initial], axis=0).T
+    Zc_ini = np.append([idx_c], [Zc_initial], axis=0).T
 
-            lines_copy = update_loads(Za_ini, lines_copy)
-            lines_copy = update_loads(Zb_ini, lines_copy)
-            lines_copy = update_loads(Zc_ini, lines_copy)
+    lines_copy = update_loads(Za_ini, lines_copy)
+    lines_copy = update_loads(Zb_ini, lines_copy)
+    lines_copy = update_loads(Zc_ini, lines_copy)
 
-            with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w") as file:
-                file.writelines(lines_copy)
+    return lines_copy
 
 
 def load_change_list_creator(load_percentages: list):
