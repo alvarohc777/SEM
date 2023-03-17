@@ -141,7 +141,7 @@ def readPL4(pl4file: str):
         )
         currentDirectory = os.getcwd()
         file_path = f"{CWD}\{SCENARIOS_DIR}\\"
-        initial = time.time()
+
         archivopl4 = pl4file
 
         # ------------ CONVERT DATA TO CSV--------------#
@@ -169,6 +169,6 @@ def readPL4(pl4file: str):
                 os.mkdir(s)
 
             s = s + "\\"
-        csv_name = csv_path + "\\" + archivopl4.split(".")[0] + ".csv"
+
+        csv_name = f"{csv_path}\{archivopl4[:-4]}.csv"
         data.to_csv(csv_name, sep=";", index=False)
-        final = time.time()
