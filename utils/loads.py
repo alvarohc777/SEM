@@ -1,5 +1,6 @@
 import utils.CONFIG
 from utils.CONFIG import EVENTS_DIR, EVENT_FILES_LIST, SCENARIOS_DIR
+from utils.components import single_phase_switch, three_phase_switch
 
 # Matrices and stats
 from scipy.stats import truncnorm
@@ -188,8 +189,8 @@ def update_loads(Z_array: np.ndarray, lines_copy: list) -> list:
         z = Z[1]
 
         idx = int(idx)
-        R = f"{z.real:.6f}".center(12)
-        X = f"{z.imag:.6f}".center(12)
+        R = f"{z.real:.6f}"[:12].center(12)
+        X = f"{z.imag:.6f}"[:12].center(12)
         line = lines_copy[idx]
         new_line = f"{line[:30]}{R}{line[42:46]}{X}{line[58:]}"
 
@@ -273,7 +274,7 @@ def target_load_state(YA, YB, YC, lines_copy, atp_file_name):
     load_amount = len_a + len_b + len_c
 
     delta_cargabilidad = cargabilidad_final - cargabilidad_inicial
-    print(delta_cargabilidad)
+
     target_load = (
         get_truncated_normal(mean=delta_cargabilidad, sd=2, low=-10, upp=10).rvs(
             load_amount
@@ -357,3 +358,111 @@ def target_load(
 
 
 target_load_vect = np.vectorize(target_load)
+
+
+def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
+    # Extraer Lineas de las cargas en archivo
+    three_phase_loads = []
+    single_phase_loads = []
+    switches = []
+    for idx, line in enumerate(target_lines):
+        if "C Load" in line:
+            if "3f" in line:
+                three_phase_loads.append(target_lines[idx : idx + 4])
+            else:
+                single_phase_loads.append(target_lines[idx : idx + 2])
+        if "/BRANCH" in line:
+            branch_idx = idx
+        if "/SWITCH" in line:
+            switch_idx = idx
+
+    # Aleatorizar el tiempo de entrada de cada carga
+
+    ti = params["ti"]
+    ti = 0.03
+    tf = params["tf"]
+    # three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads), 3))
+    # three_phase_ti = np.around(three_phase_ti, 5)
+    # single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads))
+    # single_phase_ti = np.around(single_phase_ti, 5)
+
+    tff = str(tf).rjust(10)
+    tii = str(ti).rjust(10)
+    for load_idx, loads in enumerate(three_phase_loads):
+        switch = three_phase_switch.copy()
+        switch_node = []
+        for idx, load in enumerate(loads):
+            if idx == 0:
+                load_node = f"L{load_idx}"
+                loads[idx] = f"{load.strip()}-Load Change".ljust(80) + "\n"
+                switch_node.append(f"{load.strip()} - switch".ljust(80) + "\n")
+                continue
+
+            node_1 = load[2:8]
+            node_2 = load[8:14].strip()
+
+            phase_1 = node_1.strip()[-1]
+            load_node_phase = f"{load_node}{phase_1}".center(6)
+
+            phase_2 = ""
+            load_node_phase_2 = "".center(6)
+
+            if node_2:
+                phase_2 = node_2[-1]
+                load_node_phase_2 = f"{load_node}{phase_2}".center(6)
+
+            switch_ln = switch[idx]
+            ti = tii
+            # ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+
+            # Create new Lines
+            switch[
+                idx
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
+            switch_node.append(switch[idx])
+        switches.append(switch_node)
+    new_idx = load_idx
+    for load_idx, loads in enumerate(single_phase_loads):
+        switch = single_phase_switch.copy()
+        switch_node = []
+        for idx, load in enumerate(loads):
+            if idx == 0:
+                load_node = f"L{load_idx + new_idx}"
+                loads[idx] = f"{load.strip()}-Load Change mono".ljust(80) + "\n"
+                switch_node.append(f"{load.strip()} - switch mono".ljust(80) + "\n")
+                continue
+
+            node_1 = load[2:8]
+            node_2 = load[8:14].strip()
+
+            phase_1 = node_1.strip()[-1]
+            load_node_phase = f"{load_node}{phase_1}".center(6)
+
+            phase_2 = ""
+            load_node_phase_2 = "".center(6)
+
+            if node_2:
+                phase_2 = node_2[-1]
+                load_node_phase_2 = f"{load_node}{phase_2}".center(6)
+
+            switch_ln = switch[idx]
+            ti = tii
+            # ti = str(single_phase_ti[load_idx]).rjust(10)
+
+            # Create new Lines
+            switch[
+                idx
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
+            switch_node.append(switch[idx])
+        switches.append(switch_node)
+
+    for switch in switches:
+        lines_copy[switch_idx + 2 : switch_idx + 2] = switch
+    for load in three_phase_loads:
+        lines_copy[branch_idx + 3 : branch_idx + 3] = load
+    for load in single_phase_loads:
+        lines_copy[branch_idx + 3 : branch_idx + 3] = load
+
+    return lines_copy

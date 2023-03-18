@@ -30,8 +30,8 @@ def inputs() -> dict:
     Rf = 20
     R_step = 20
 
-    ti = 0.05
-    tf = 0.1
+    ti = 0.001
+    tf = 0.06
     microgrid_state = True
 
     faults_checkbox = {

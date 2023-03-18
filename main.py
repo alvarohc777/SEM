@@ -116,6 +116,7 @@ def main():
                 target_lines = loads.target_load_state(
                     Ya, Yb, Yc, lines_copy, atp_file_name
                 )
+                lines_copy = loads.load_change(lines_copy, target_lines, params)
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
 
