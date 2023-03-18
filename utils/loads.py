@@ -199,7 +199,6 @@ def update_loads(Z_array: np.ndarray, lines_copy: list) -> list:
 
 def initial_load_state(YA, YB, YC, lines_copy, atp_file_name):
     pattern_load = "L(\d{3}\.\d{2})"
-    pattern_load_change = "LC(\d{3}\.\d{2})_(\d{3}\.\d{2})"
     cargabilidad_inicial = float(re.search(pattern_load, atp_file_name).group(1))
 
     Ya = np.copy(YA[:, 1])
@@ -231,8 +230,8 @@ def initial_load_state(YA, YB, YC, lines_copy, atp_file_name):
         Yc * initial_c,
     )
 
-    # Admitancia total luego de la variación de carga
-    Y_initial_total = Ya_initial.sum() + Yb_initial.sum() + Yc_initial.sum()
+    # # Admitancia total luego de la variación de carga
+    # Y_initial_total = Ya_initial.sum() + Yb_initial.sum() + Yc_initial.sum()
 
     # Hallar impedancias a partir de las admitancias
     Za_initial = 1 / Ya_initial
@@ -244,11 +243,70 @@ def initial_load_state(YA, YB, YC, lines_copy, atp_file_name):
     Zb_ini = np.append([idx_b], [Zb_initial], axis=0).T
     Zc_ini = np.append([idx_c], [Zc_initial], axis=0).T
 
+    YA[:, 1] = Ya_initial
+    YB[:, 1] = Yb_initial
+    YC[:, 1] = Yc_initial
+
     lines_copy = update_loads(Za_ini, lines_copy)
     lines_copy = update_loads(Zb_ini, lines_copy)
     lines_copy = update_loads(Zc_ini, lines_copy)
 
-    return lines_copy
+    return lines_copy, YA, YB, YC
+
+
+def target_load_state(YA, YB, YC, lines_copy, atp_file_name):
+    target_lines = lines_copy.copy()
+    pattern_load_change = "L(\d{3}\.\d{2})_(\d{3}\.\d{2})"
+    cargabilidad_inicial = float(re.search(pattern_load_change, atp_file_name).group(1))
+    cargabilidad_final = float(re.search(pattern_load_change, atp_file_name).group(2))
+
+    Ya = np.copy(YA[:, 1])
+    Yb = np.copy(YB[:, 1])
+    Yc = np.copy(YC[:, 1])
+    idx_a = np.copy(YA[:, 0])
+    idx_b = np.copy(YB[:, 0])
+    idx_c = np.copy(YC[:, 0])
+
+    len_a = Ya.shape[0]
+    len_b = Yb.shape[0]
+    len_c = Yc.shape[0]
+    load_amount = len_a + len_b + len_c
+
+    delta_cargabilidad = cargabilidad_final - cargabilidad_inicial
+    print(delta_cargabilidad)
+    target_load = (
+        get_truncated_normal(mean=delta_cargabilidad, sd=2, low=-10, upp=10).rvs(
+            load_amount
+        )
+        / 100
+    )
+
+    # Variación de Carga por Fase
+    target_a, target_b, target_c = load_split(target_load, len_a, len_b, len_c)
+
+    # Admitancias por fase iniciales y finales
+    Ya_target = Ya * target_a + Ya
+    Yb_target = Yb * target_b + Yb
+    Yc_target = Yc * target_c + Yc
+
+    # # Admitancia total luego de la variación de carga
+    # Y_target_total = Ya_target.sum() + Yb_target.sum() + Yc_target.sum()
+
+    # Hallar impedancias a partir de las admitancias
+    Za_target = 1 / Ya_target
+    Zb_target = 1 / Yb_target
+    Zc_target = 1 / Yc_target
+
+    # Crear nuevo vector de impedancias con índices (concatenar Z_target/target con idx)
+    Za_target = np.append([idx_a], [Za_target], axis=0).T
+    Zb_target = np.append([idx_b], [Zb_target], axis=0).T
+    Zc_target = np.append([idx_c], [Zc_target], axis=0).T
+
+    target_lines = update_loads(Za_target, target_lines)
+    target_lines = update_loads(Zb_target, target_lines)
+    target_lines = update_loads(Zc_target, target_lines)
+
+    return target_lines
 
 
 def load_change_list_creator(load_percentages: list):

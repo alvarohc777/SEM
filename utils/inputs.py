@@ -24,11 +24,10 @@ def inputs() -> dict:
     # For Fault simulations
     buses = [
         802,
-        832,
     ]
     Ri = 0.00001
 
-    Rf = 100
+    Rf = 20
     R_step = 20
 
     ti = 0.05
@@ -37,7 +36,7 @@ def inputs() -> dict:
 
     faults_checkbox = {
         "fault01": True,
-        "fault02": True,
+        "fault02": False,
         "fault03": False,
         "fault04": False,
         "fault05": False,
@@ -54,7 +53,7 @@ def inputs() -> dict:
 
     params["min_load"] = 70
     params["max_load"] = 135
-    params["events_amount"] = 10
+    params["events_amount"] = 4
     params["max_load_step"] = 5
 
     # Save params in dictionary

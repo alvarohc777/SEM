@@ -84,7 +84,9 @@ def main():
                 print(atp_file_name)
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                lines_copy, *_ = initial_load_state(
+                    Ya, Yb, Yc, lines_copy, atp_file_name
+                )
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
     if params["event"] == "load_change":
@@ -104,11 +106,16 @@ def main():
         Ya, Yb, Yc = base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
+                print(f"atp_file_name: {atp_file_name}")
                 atp_file_name = atp_file_name.strip("\n")
-                print(atp_file_name)
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                lines_copy, Ya, Yb, Yc = initial_load_state(
+                    Ya, Yb, Yc, lines_copy, atp_file_name
+                )
+                target_lines = loads.target_load_state(
+                    Ya, Yb, Yc, lines_copy, atp_file_name
+                )
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
 
@@ -153,7 +160,9 @@ def main():
                 # Modify copied lines
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy = initial_load_state(Ya, Yb, Yc, lines_copy, atp_file_name)
+                lines_copy, *_ = initial_load_state(
+                    Ya, Yb, Yc, lines_copy, atp_file_name
+                )
                 lines_copy = faults.atp_fault_file(
                     lines_copy, params, element_idx, atp_file_name
                 )
