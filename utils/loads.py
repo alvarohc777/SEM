@@ -365,7 +365,6 @@ target_load_vect = np.vectorize(target_load)
 
 
 def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
-    copy2 = lines_copy.copy()
     three_phase_loads_i = []
     single_phase_loads_i = []
     three_phase_indices = []
@@ -387,7 +386,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     ti = -1
     tf = params["ti"]
     ti = -1
-    tf = 0.033
+    tf = 0.03
     three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads_i), 3))
     three_phase_ti = np.around(three_phase_ti, 5)
     single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads_i))
@@ -501,7 +500,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads))
     single_phase_ti = np.around(single_phase_ti, 5)
 
-    ti = 0.033
+    ti = 0.03
     tf = 0.1
 
     tf = str(tf).rjust(10)
@@ -584,5 +583,8 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
         lines_copy[branch_idx + 3 : branch_idx + 3] = load
     for load in single_phase_loads:
         lines_copy[branch_idx + 3 : branch_idx + 3] = load
+    for idx, line in reversed(list(enumerate(lines_copy))):
+        if "1.E30" in line:
+            del lines_copy[idx]
 
     return lines_copy

@@ -51,8 +51,8 @@ def inputs() -> dict:
 
     # For chargeability simulations
 
-    params["min_load"] = 90
-    params["max_load"] = 110
+    params["min_load"] = 99
+    params["max_load"] = 101
     params["events_amount"] = 2
     params["max_load_step"] = 5
 
