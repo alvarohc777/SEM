@@ -365,6 +365,7 @@ target_load_vect = np.vectorize(target_load)
 
 
 def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
+    copy2 = lines_copy.copy()
     three_phase_loads_i = []
     single_phase_loads_i = []
     three_phase_indices = []
@@ -383,16 +384,17 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
         if "/SWITCH" in line:
             switch_idx = idx
     # Aleatorizar el tiempo de cambio de cada carga
-    # ti = params["ti"]
-    ti = -10
+    ti = -1
     tf = params["ti"]
+    ti = -1
+    tf = 0.033
     three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads_i), 3))
     three_phase_ti = np.around(three_phase_ti, 5)
     single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads_i))
     single_phase_ti = np.around(single_phase_ti, 5)
 
-    tff = str(tf).rjust(10)
-    tii = str(ti).rjust(10)
+    tf = str(tf).rjust(10)
+    ti = str(ti).rjust(10)
 
     for load_idx, loads in enumerate(three_phase_loads_i):
         switch = three_phase_switch.copy()
@@ -418,13 +420,13 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = tii
-            # ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+            # ti = ti
+            # tf = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
             switch[
                 idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -455,13 +457,13 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = tii
-            # ti = str(single_phase_ti[load_idx]).rjust(10)
+            # ti = ti
+            # tf = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
             switch[
                 idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -499,8 +501,11 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads))
     single_phase_ti = np.around(single_phase_ti, 5)
 
-    tff = str(tf).rjust(10)
-    tii = str(ti).rjust(10)
+    ti = 0.033
+    tf = 0.1
+
+    tf = str(tf).rjust(10)
+    ti = str(ti).rjust(10)
 
     for load_idx, loads in enumerate(three_phase_loads):
         switch = three_phase_switch.copy()
@@ -526,13 +531,13 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = tii
+            # tf = tf
             # ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
             switch[
                 idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -562,13 +567,13 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = tii
+            # ti = tii
             # ti = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
             switch[
                 idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
