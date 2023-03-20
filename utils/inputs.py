@@ -30,7 +30,7 @@ def inputs() -> dict:
     Rf = 20
     R_step = 20
 
-    ti = 0.001
+    ti = 0.03
     tf = 0.06
     microgrid_state = True
 
@@ -51,9 +51,9 @@ def inputs() -> dict:
 
     # For chargeability simulations
 
-    params["min_load"] = 70
-    params["max_load"] = 135
-    params["events_amount"] = 4
+    params["min_load"] = 40
+    params["max_load"] = 70
+    params["events_amount"] = 2
     params["max_load_step"] = 5
 
     # Save params in dictionary

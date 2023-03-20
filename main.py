@@ -103,7 +103,7 @@ def main():
         target_load_values = np.around(target_load_values, 2)
         load_values = np.stack((initial_load_values, target_load_values), axis=1)
         loads.load_change_list_creator(load_values)
-        Ya, Yb, Yc = base_file_loads(lines)
+        YA, YB, YC = base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
                 print(f"atp_file_name: {atp_file_name}")
@@ -111,7 +111,7 @@ def main():
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
                 lines_copy, Ya, Yb, Yc = initial_load_state(
-                    Ya, Yb, Yc, lines_copy, atp_file_name
+                    YA, YB, YC, lines_copy, atp_file_name
                 )
                 target_lines = loads.target_load_state(
                     Ya, Yb, Yc, lines_copy, atp_file_name
@@ -119,6 +119,7 @@ def main():
                 lines_copy = loads.load_change(lines_copy, target_lines, params)
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
+        # atp_exec.atp_files_execution()
 
     if params["event"] == "fault":
         # Fault simulation parameters
@@ -152,7 +153,7 @@ def main():
 
         initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
         load_list_creator(initial_load_values)
-        Ya, Yb, Yc = base_file_loads(lines)
+        YA, YB, YC = base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
                 atp_file_name = atp_file_name.strip("\n")
@@ -162,7 +163,7 @@ def main():
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
                 lines_copy, *_ = initial_load_state(
-                    Ya, Yb, Yc, lines_copy, atp_file_name
+                    YA, YB, YC, lines_copy, atp_file_name
                 )
                 lines_copy = faults.atp_fault_file(
                     lines_copy, params, element_idx, atp_file_name
