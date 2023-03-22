@@ -386,12 +386,11 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     ti = -1
     tf = params["ti"]
     ti = -1
-    tf = 0.03
-    three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads_i), 3))
+    tf = 0.25
+    three_phase_ti = np.random.uniform(0, tf, (len(three_phase_loads_i), 3))
     three_phase_ti = np.around(three_phase_ti, 5)
-    single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads_i))
+    single_phase_ti = np.random.uniform(0, tf, len(single_phase_loads_i))
     single_phase_ti = np.around(single_phase_ti, 5)
-
     tf = str(tf).rjust(10)
     ti = str(ti).rjust(10)
 
@@ -420,7 +419,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
 
             switch_ln = switch[idx]
             # ti = ti
-            # tf = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+            tf = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
             switch[
@@ -457,7 +456,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
 
             switch_ln = switch[idx]
             # ti = ti
-            # tf = str(single_phase_ti[load_idx]).rjust(10)
+            tf = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
             switch[
@@ -495,14 +494,13 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     ti = params["ti"]
     # ti = -1
     tf = params["tf"]
-    three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads), 3))
-    three_phase_ti = np.around(three_phase_ti, 5)
-    single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads))
-    single_phase_ti = np.around(single_phase_ti, 5)
+    # three_phase_ti = np.random.uniform(ti, tf, (len(three_phase_loads), 3))
+    # three_phase_ti = np.around(three_phase_ti, 5)
+    # single_phase_ti = np.random.uniform(ti, tf, len(single_phase_loads))
+    # single_phase_ti = np.around(single_phase_ti, 5)
 
-    ti = 0.03
-    tf = 0.1
-
+    ti = 0.25
+    tf = 1
     tf = str(tf).rjust(10)
     ti = str(ti).rjust(10)
 
@@ -531,7 +529,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
 
             switch_ln = switch[idx]
             # tf = tf
-            # ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+            ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
             switch[
@@ -567,7 +565,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
 
             switch_ln = switch[idx]
             # ti = tii
-            # ti = str(single_phase_ti[load_idx]).rjust(10)
+            ti = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
             switch[
@@ -580,9 +578,9 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     for switch in switches:
         lines_copy[switch_idx + 2 : switch_idx + 2] = switch
     for load in three_phase_loads:
-        lines_copy[branch_idx + 3 : branch_idx + 3] = load
+        lines_copy[branch_idx + 4 : branch_idx + 4] = load
     for load in single_phase_loads:
-        lines_copy[branch_idx + 3 : branch_idx + 3] = load
+        lines_copy[branch_idx + 4 : branch_idx + 4] = load
     for idx, line in reversed(list(enumerate(lines_copy))):
         if "1.E30" in line:
             del lines_copy[idx]

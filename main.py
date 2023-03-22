@@ -109,7 +109,7 @@ def main():
                 print(f"atp_file_name: {atp_file_name}")
                 atp_file_name = atp_file_name.strip("\n")
                 lines_copy = lines.copy()
-                lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
+                # lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
                 lines_copy, Ya, Yb, Yc = initial_load_state(
                     YA, YB, YC, lines_copy, atp_file_name
                 )
