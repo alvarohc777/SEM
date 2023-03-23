@@ -386,7 +386,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     ti = -1
     tf = params["ti"]
     ti = -1
-    tf = 0.25
+    tf = 0.5
     three_phase_ti = np.random.uniform(0, tf, (len(three_phase_loads_i), 3))
     three_phase_ti = np.around(three_phase_ti, 5)
     single_phase_ti = np.random.uniform(0, tf, len(single_phase_loads_i))

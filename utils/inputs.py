@@ -15,8 +15,8 @@ def inputs() -> dict:
     CWD = CONFIG.CWD
     BASE_FILES_DIR = CONFIG.BASE_FILES_DIR
 
-    base_file_name = "IEEE34.atp"
-    # base_file_name = "IEEE34_form1_5s.atp"
+    # base_file_name = "IEEE34.atp"
+    base_file_name = "IEEE34_5s.atp"
     # base_file_name = "IEEE34_No_MG.atp"
     # base_file_name = "IEEE34_NoSwitches.atp"
     # base_file_name = "IEEE34_form1_update_loads.atp"
@@ -57,8 +57,8 @@ def inputs() -> dict:
     # For chargeability simulations
 
     params["min_load"] = 40
-    params["max_load"] = 160
-    params["events_amount"] = 2
+    params["max_load"] = 200
+    params["events_amount"] = 5
     params["max_load_step"] = 5
 
     # Save params in dictionary
@@ -75,7 +75,7 @@ def inputs() -> dict:
     params["base_file_path"] = base_file_path
     params["base_file_name"] = base_file_name
 
-    params["event"] = "fault"
+    # params["event"] = "fault"
     # params["event"] = "loads"
-    # params["event"] = "load_change"
+    params["event"] = "load_change"
     return params
