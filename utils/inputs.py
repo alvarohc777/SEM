@@ -15,8 +15,8 @@ def inputs() -> dict:
     CWD = CONFIG.CWD
     BASE_FILES_DIR = CONFIG.BASE_FILES_DIR
 
-    # base_file_name = "IEEE34.atp"
-    base_file_name = "IEEE34_5s.atp"
+    base_file_name = "IEEE34.atp"
+    # base_file_name = "IEEE34_5s.atp"
     # base_file_name = "IEEE34_No_MG.atp"
     # base_file_name = "IEEE34_NoSwitches.atp"
     # base_file_name = "IEEE34_form1_update_loads.atp"
@@ -27,38 +27,36 @@ def inputs() -> dict:
     CONFIG.BASE_FILE_PATH = base_file_path
 
     # For Fault simulations
-    buses = [
-        802,
-    ]
+    buses = [806, 312, 830]
     Ri = 0.00001
 
-    Rf = 20
+    Rf = 100
     R_step = 20
 
-    ti = 0.03
-    tf = 0.06
+    ti = 0.0166665
+    tf = 1
     microgrid_state = True
 
     faults_checkbox = {
         "fault01": True,
-        "fault02": False,
-        "fault03": False,
-        "fault04": False,
-        "fault05": False,
-        "fault06": False,
-        "fault07": False,
-        "fault08": False,
-        "fault09": False,
-        "fault10": False,
-        "fault11": False,
+        "fault02": True,
+        "fault03": True,
+        "fault04": True,
+        "fault05": True,
+        "fault06": True,
+        "fault07": True,
+        "fault08": True,
+        "fault09": True,
+        "fault10": True,
+        "fault11": True,
     }
     # For new chargeability atp
 
     # For chargeability simulations
 
-    params["min_load"] = 40
-    params["max_load"] = 200
-    params["events_amount"] = 5
+    params["min_load"] = 90
+    params["max_load"] = 120
+    params["events_amount"] = 160
     params["max_load_step"] = 5
 
     # Save params in dictionary
@@ -75,7 +73,7 @@ def inputs() -> dict:
     params["base_file_path"] = base_file_path
     params["base_file_name"] = base_file_name
 
-    # params["event"] = "fault"
+    params["event"] = "fault"
     # params["event"] = "loads"
-    params["event"] = "load_change"
+    # params["event"] = "load_change"
     return params
