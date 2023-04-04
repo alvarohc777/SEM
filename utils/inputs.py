@@ -16,7 +16,7 @@ def inputs() -> dict:
     BASE_FILES_DIR = CONFIG.BASE_FILES_DIR
 
     # base_file_name = "IEEE34.atp"
-    base_file_name = "IEEE34_5s.atp"
+    base_file_name = "prueba.atp"
     # base_file_name = "IEEE34_No_MG.atp"
     # base_file_name = "IEEE34_NoSwitches.atp"
     # base_file_name = "IEEE34_form1_update_loads.atp"
@@ -56,9 +56,9 @@ def inputs() -> dict:
 
     # For chargeability simulations
 
-    params["min_load"] = 40
-    params["max_load"] = 200
-    params["events_amount"] = 5
+    params["min_load"] = 30
+    params["max_load"] = 60
+    params["events_amount"] = 3
     params["max_load_step"] = 5
 
     # Save params in dictionary

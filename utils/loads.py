@@ -500,7 +500,7 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
     # single_phase_ti = np.around(single_phase_ti, 5)
 
     ti = 0.25
-    tf = 1
+    tf = 100
     tf = str(tf).rjust(10)
     ti = str(ti).rjust(10)
 
