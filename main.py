@@ -120,7 +120,6 @@ def main():
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
                     file.writelines(lines_copy)
         # atp_exec.atp_files_execution()
-
     if params["event"] == "fault":
         # Fault simulation parameters
         buses = params["buses"]

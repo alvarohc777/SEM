@@ -15,7 +15,7 @@ def inputs() -> dict:
     CWD = CONFIG.CWD
     BASE_FILES_DIR = CONFIG.BASE_FILES_DIR
 
-    base_file_name = "IEEE34.atp"
+    base_file_name = "IEEE34_T01_V1.atp"
     # base_file_name = "IEEE34_5s.atp"
     # base_file_name = "IEEE34_No_MG.atp"
     # base_file_name = "IEEE34_NoSwitches.atp"
@@ -27,14 +27,14 @@ def inputs() -> dict:
     CONFIG.BASE_FILE_PATH = base_file_path
 
     # For Fault simulations
-    buses = [806, 312, 830]
+    buses = [312, 116]
     Ri = 0.00001
 
-    Rf = 100
-    R_step = 20
+    Rf = 0.00001
+    R_step = 0.00001
 
-    ti = 0.0166665
-    tf = 1
+    ti = 0.05
+    tf = 4
     microgrid_state = True
 
     faults_checkbox = {
