@@ -13,8 +13,24 @@ from pathlib import Path
 
 
 def initial_loads_creator(
-    min_load: float, max_load: float, events_amount
+    min_load: float, max_load: float, events_amount: int
 ) -> np.ndarray:
+    """Creates an array with initial system load values following a normal distribution
+
+    Parameters
+    ----------
+    min_load : float
+        minimum load value
+    max_load : float
+        maximum load value
+    events_amount : int
+        amount of simulated events
+
+    Returns
+    -------
+    np.ndarray
+        array with initial values following a normal distribution
+    """
     return np.around(np.random.uniform(min_load, max_load, events_amount), 2)
 
 
