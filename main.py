@@ -1,30 +1,5 @@
-# For readpl4 Function
-import struct
-import mmap
-
-# NumPy Stack
-import pandas as pd
+# From NumPy Stack
 import numpy as np
-from scipy.stats import truncnorm
-
-# Measure Performance
-import time
-
-# To access os
-import subprocess
-import glob
-import os
-import shutil
-
-# To find patterns
-import re
-
-# Other
-from itertools import repeat
-import random
-
-# Multiprocessing
-import concurrent.futures
 
 # CONSTANTS
 from utils.CONFIG import EVENTS_DIR, EVENT_FILES_LIST, SCENARIOS_DIR
@@ -40,22 +15,11 @@ import utils.tool_start as tool_start
 import utils.faults as faults
 
 
-from utils.loads import (
-    initial_loads_creator,
-    load_list_creator,
-    base_file_loads,
-    initial_load_state,
-)
-
-
 # Simulating App Inputs
-
-
 def main():
     params = inputs.inputs()
     tool_start.create_directories()
     BASE_FILE_PATH = CONFIG.BASE_FILE_PATH
-    BASE_FILE_NAME = CONFIG.BASE_FILE_NAME
 
     # Copy lines from base file
     with open(BASE_FILE_PATH, "r+") as f:
@@ -77,17 +41,19 @@ def main():
         max_load_step = params["max_load_step"]
         events_amount = params["events_amount"]
 
-        initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
-        load_list_creator(initial_load_values)
+        initial_load_values = loads.initial_loads_creator(
+            min_load, max_load, events_amount
+        )
+        loads.load_list_creator(initial_load_values)
 
-        Ya, Yb, Yc = base_file_loads(lines)
+        Ya, Yb, Yc = loads.base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
                 atp_file_name = atp_file_name.strip("\n")
                 print(atp_file_name)
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy, *_ = initial_load_state(
+                lines_copy, *_ = loads.initial_load_state(
                     Ya, Yb, Yc, lines_copy, atp_file_name
                 )
                 with open(f"{SCENARIOS_DIR}\{atp_file_name}", "w+") as file:
@@ -99,21 +65,23 @@ def main():
         max_load_step = params["max_load_step"]
         events_amount = params["events_amount"]
 
-        initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
+        initial_load_values = loads.initial_loads_creator(
+            min_load, max_load, events_amount
+        )
         target_load_values = loads.target_load_vect(
             initial_load_values, max_load, min_load, max_load_step
         )
         target_load_values = np.around(target_load_values, 2)
         load_values = np.stack((initial_load_values, target_load_values), axis=1)
         loads.load_change_list_creator(load_values)
-        YA, YB, YC = base_file_loads(lines)
+        YA, YB, YC = loads.base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
                 print(f"atp_file_name: {atp_file_name}")
                 atp_file_name = atp_file_name.strip("\n")
                 lines_copy = lines.copy()
                 # lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy, Ya, Yb, Yc = initial_load_state(
+                lines_copy, Ya, Yb, Yc = loads.initial_load_state(
                     YA, YB, YC, lines_copy, atp_file_name
                 )
                 target_lines = loads.target_load_state(
@@ -153,9 +121,11 @@ def main():
         max_load_step = params["max_load_step"]
         events_amount = len(bus_impedance) * len(checked_faults)
 
-        initial_load_values = initial_loads_creator(min_load, max_load, events_amount)
-        load_list_creator(initial_load_values)
-        YA, YB, YC = base_file_loads(lines)
+        initial_load_values = loads.initial_loads_creator(
+            min_load, max_load, events_amount
+        )
+        loads.load_list_creator(initial_load_values)
+        YA, YB, YC = loads.base_file_loads(lines)
         with open(f"{EVENTS_DIR}\{EVENT_FILES_LIST}", "r") as f:
             for atp_file_name in f:
                 atp_file_name = atp_file_name.strip("\n")
@@ -164,7 +134,7 @@ def main():
                 # Modify copied lines
                 lines_copy = lines.copy()
                 lines_copy = phase_angle.source_phase_change(lines_copy, element_idx)
-                lines_copy, *_ = initial_load_state(
+                lines_copy, *_ = loads.initial_load_state(
                     YA, YB, YC, lines_copy, atp_file_name
                 )
                 lines_copy = faults.atp_fault_file(
