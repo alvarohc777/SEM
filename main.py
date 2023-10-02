@@ -30,8 +30,7 @@ import concurrent.futures
 from utils.CONFIG import EVENTS_DIR, EVENT_FILES_LIST, SCENARIOS_DIR
 
 import utils.CONFIG as CONFIG
-from utils import loads, tool_start
-from utils.tool_start import create_directories
+from utils import loads, tool_start, simulation_settings
 
 # import modules from utils
 import utils.inputs as inputs
@@ -63,6 +62,10 @@ def main():
         lines = f.readlines()
 
     element_idx = tool_start.element_indices(lines)
+
+    lines = simulation_settings.update_simulation_time(
+        lines, params["simulation_time"], element_idx["simulation_time"]
+    )
 
     if params["event"] == "loads":
         # Initial Parameters

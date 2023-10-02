@@ -38,6 +38,8 @@ def element_indices(lines: list) -> dict:
     """
     element_idx = {}
     for line_idx, line in enumerate(lines):
+        if "C  dT  >< Tmax >< Xopt >< Copt ><Epsiln>" in line:
+            element_idx["simulation_time"] = line_idx + 1
         if "C RFA" in line:
             element_idx["lineA"] = line_idx + 1
         if "C RFB" in line:
@@ -64,9 +66,5 @@ def element_indices(lines: list) -> dict:
             element_idx["load_switch_tri"] = lines[line_idx : line_idx + 4].copy()
         if "C switch load mono" in line:
             element_idx["load_switch_mono"] = lines[line_idx : line_idx + 2].copy()
-        # if "C switch load tri" in line:
-        #     element_idx["load_switch_tri"] = lines[line_idx : line_idx + 4].copy()
-        # elif "C switch load mono" in line:
-        #     element_idx["load_switch_mono"] = lines[line_idx : line_idx + 2].copy()
 
     return element_idx

@@ -30,6 +30,8 @@ def inputs() -> dict:
     buses = [312, 116]
     Ri = 0.00001
 
+    simulation_time = 0.05
+
     Rf = 0.00001
     R_step = 0.00001
 
@@ -51,6 +53,7 @@ def inputs() -> dict:
         "fault11": True,
     }
     # For new chargeability atp
+    params["simulation_time"] = simulation_time
 
     # For chargeability simulations
 
