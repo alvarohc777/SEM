@@ -399,11 +399,8 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
         if "/SWITCH" in line:
             switch_idx = idx
     # Aleatorizar el tiempo de cambio de cada carga
-    tf = params["ti"]
-    # ti = -1
-    # tf = 0.5
-    ti = params["ti"]
-    tf = params["tf"]
+    ti = 0
+    tf = params["simulation_time"]
     three_phase_ti = np.random.uniform(0, tf, (len(three_phase_loads_i), 3))
     three_phase_ti = np.around(three_phase_ti, 5)
     single_phase_ti = np.random.uniform(0, tf, len(single_phase_loads_i))
@@ -435,12 +432,12 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            tf = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+            tff = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
-            switch[
-                idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
+            switch[idx] = (
+                f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            )
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -471,12 +468,12 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            tf = str(single_phase_ti[load_idx]).rjust(10)
+            tff = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
-            switch[
-                idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
+            switch[idx] = (
+                f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tff}{switch_ln[34:]}"
+            )
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -507,14 +504,6 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
         if "/SWITCH" in line:
             switch_idx = idx
 
-    ti = params["ti"]
-    tf = params["tf"]
-
-    # ti = 0.25
-    # tf = 1
-    tf = str(tf).rjust(10)
-    ti = str(ti).rjust(10)
-
     for load_idx, loads in enumerate(three_phase_loads):
         switch = three_phase_switch.copy()
         switch_node = []
@@ -539,12 +528,12 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
+            tii = str(three_phase_ti[load_idx, idx - 1]).rjust(10)
 
             # Create new Lines
-            switch[
-                idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
+            switch[idx] = (
+                f"{switch_ln[:2]}{node_1}{load_node_phase}{tii}{tf}{switch_ln[34:]}"
+            )
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
@@ -574,12 +563,12 @@ def load_change(lines_copy: list, target_lines: list, params: dict) -> list:
                 load_node_phase_2 = f"{load_node}{phase_2}".center(6)
 
             switch_ln = switch[idx]
-            ti = str(single_phase_ti[load_idx]).rjust(10)
+            tii = str(single_phase_ti[load_idx]).rjust(10)
 
             # Create new Lines
-            switch[
-                idx
-            ] = f"{switch_ln[:2]}{node_1}{load_node_phase}{ti}{tf}{switch_ln[34:]}"
+            switch[idx] = (
+                f"{switch_ln[:2]}{node_1}{load_node_phase}{tii}{tf}{switch_ln[34:]}"
+            )
             loads[idx] = f"{load[:2]}{load_node_phase}{load_node_phase_2}{load[14:]}"
             switch_node.append(switch[idx])
         switches.append(switch_node)
